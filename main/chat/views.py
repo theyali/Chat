@@ -1,9 +1,11 @@
+import json
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import User, UserProfile, Wallet
+from .utils import DecimalEncoder
+from .models import User, UserProfile, Wallet, Transaction
 from django.contrib.auth import authenticate, login, logout
-from .forms import MyUserCreationForm
+from .forms import MyUserCreationForm, DepositForm
 from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -158,7 +160,9 @@ def user_profile(request, username):
 
 @login_required
 def wallet_history(request):
+    transactions = Transaction.objects.all()
     context = get_common_context(request)
+    context.update({'transaction':transactions})
     return render(request, 'chat/wallet_history.html', context=context)
 
 @login_required
@@ -180,10 +184,47 @@ def referrals(request):
 @login_required
 def donate(request):
     context = get_common_context(request)
+    if request.method == 'POST':
+        form = DepositForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            # Store the amount in the session
+            json_data = json.dumps(amount, cls=DecimalEncoder)
+            request.session['donation_amount'] = json_data
+            # Process the donation with the given amount
+            # Redirect to a success page or display a success message
+            return redirect('proceed_donate')
+    else:
+        form = DepositForm()
+    context['form'] = form
     return render(request, 'chat/donate.html', context=context)
 
+@login_required
+def proceed_donate(request):
+    context = get_common_context(request)
+    # Get the amount from the session
+    amount = request.session.get('donation_amount')
+    if not amount:
+        # If the amount is not found in the session, redirect to the donate page
+        return redirect('donate')
+    context['amount'] = amount
+    return render(request, 'chat/proceed_donate.html', context=context)
 
 @login_required
 def games(request):
     context = get_common_context(request)
     return render(request, 'chat/games.html', context=context)
+
+
+@login_required
+def payment_failed(request):
+    context = get_common_context(request)
+    return render(request, 'chat/payment_failed.html', context=context)
+@login_required
+def payment_success(request):
+    amount = request.session['donation_amount']
+    context = get_common_context(request)
+    transaction = Transaction.objects.create(user=request.user, amount=amount, status='completed', created_at=timezone.now(), updated_at=timezone.now())
+    transaction.save()
+    del request.session['donation_amount']
+    return render(request, 'chat/payment_success.html', context=context)

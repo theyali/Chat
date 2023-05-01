@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -140,7 +142,7 @@ EMAIL_USE_SSL = False
 
 
 # PAYPAL_MODE = 'sandbox'  # 'live' для реального режима
-# PAYPAL_CLIENT_ID = 'ARJCFqoUI6WIXxj7KC-9KHNBKqZiPRRHNFFr2WpJNGPuKQaXLRNDZsB-5vgbLBQovPzcnGJ8XFcGxnSQ'
-# PAYPAL_CLIENT_SECRET = 'EAmhZdjbHOYCk0v2j-Wm17hoqbvaNMHGsMtHfNv4jUcWFWHSXdTh7lszc-usvoSihU8K2GntlzzBtBXm'
+# PAYPAL_CLIENT_ID = 'ваш PayPal client ID'
+# PAYPAL_CLIENT_SECRET = 'ваш PayPal client secret'
 # PAYPAL_RETURN_URL = 'http://localhost:8000/paypal/execute/'
 # PAYPAL_CANCEL_URL = 'http://localhost:8000/paypal/cancel/'

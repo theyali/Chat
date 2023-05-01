@@ -8,11 +8,23 @@
 {% block main %}
 
 <div class="wrapper">
-<div class="title" style="padding-bottom:5%;">Пополнение счета</div>
+    <div class="title" style="margin-bottom:5%;">Пополнение счета</div>
 
-<a href="{% url 'paypal_create' %}">Пополнить баланс</a>
-
+    <form action="" method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="field">
+                {{ field }}
+                {{ field.label_tag }}
+            </div>
+        
+        {% endfor %}
+        <div class="field">
+            <input type="submit" value="Пополнить баланс">
+        </div>
+    </form>
 
 </div>
+
 
 {% endblock main %}

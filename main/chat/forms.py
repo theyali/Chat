@@ -9,7 +9,7 @@ class MyUserCreationForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 class WithdrawalForm(forms.Form):
-    amount = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, help_text='Amount to withdraw')
+    amount = forms.DecimalField(max_digits=4, decimal_places=2, min_value=0.01, help_text='Amount to withdraw')
     paypal_email = forms.EmailField(help_text='Your PayPal email address')
 
     def __init__(self, *args, **kwargs):
@@ -21,3 +21,6 @@ class WithdrawalForm(forms.Form):
         if self.user.balance < amount:
             raise forms.ValidationError('Insufficient balance.')
         return amount
+    
+class DepositForm(forms.Form):
+    amount = forms.DecimalField(max_digits=5, decimal_places=2, min_value=3, help_text='Введите сумму')

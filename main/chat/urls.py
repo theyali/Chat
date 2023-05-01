@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import CreatePaymentView, ExecutePaymentView
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -16,8 +15,8 @@ urlpatterns = [
     path('referrals/', views.referrals, name='referrals'),
     path('donate/', views.donate, name='donate'),
     path('games/', views.games, name='games'),
-
-    path('paypal/create/', CreatePaymentView.as_view(), name='paypal_create'),
-    path('paypal/execute/', ExecutePaymentView.as_view(), name='paypal_execute'),
+    path('proceed_donate/', views.proceed_donate, name='proceed_donate'),
+    path('payment_success/', views.payment_success, name='payment_success'),
+    path('payment_failed/', views.payment_failed, name='payment_failed'),
 
 ]

@@ -9,4 +9,25 @@
 {% block main %}
 
 
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Номер транзакции</th>
+            <th scope="col">Дата транзакции</th>
+            <th scope="col">Сумма</th>
+            <th scope="col">Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tr in transaction %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ tr.created_at }}</td>
+                <td>{{ tr.amount }}</td>
+                <td>{{ tr.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock main %}
