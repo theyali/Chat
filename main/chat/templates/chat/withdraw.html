@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block main %}
+
+<div class="wrapper">
+    <div class="title">Вывод Средств</div>
+    <form action="" method="POST">
+        {% csrf_token %}
+        {% for field in withdrawal_form %}
+            <div class="field">
+                {{ field }}
+                {{ field.label_tag }}
+            </div>
+        {% endfor %}
+        <div class="field">
+            <input type="submit" value="Вывод">
+        </div>
+
+    </form>
+
+
+</div>
+
+{% endblock main %}

@@ -1,0 +1,76 @@
+{% extends 'main.html' %}
+
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}Referals{% endblock page_title %}
+
+{% block main %}
+
+<div id="alert-box" role="alert">
+    <!-- Alert message will be inserted here dynamically -->
+</div>
+
+
+<div class="alert alert-success mt-4 m-auto" style="width:50%;">
+    Ваша реферальная ссылка
+   <a href="#" onclick="copyToClipboard('{{ ref_code }}')">
+    {{ ref_code }}
+    </a>
+</div>
+
+
+
+<script>
+    function copyToClipboard(text) {
+        var textField = document.createElement('textarea');
+        textField.innerText = text;
+        document.body.appendChild(textField);
+        textField.select();
+        document.execCommand('copy');
+        textField.remove();
+        var alertBox = document.getElementById("alert-box");
+        alertBox.innerText = "Скопировано в буфер обмена: " + text;
+        alertBox.classList.add("alert-box", "success");
+        setTimeout(function() {
+            alertBox.innerText = "";
+            alertBox.classList.remove("alert-box", "success");
+        }, 3000);
+    }
+</script>
+<style>
+    .alert-box {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        border-radius: .25rem;
+        z-index: 9999;
+    }
+</style>
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Пользователь</th>
+            <th scope="col">Сколько заработал</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in usernames %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td><a href="{% url 'user_profile' user %}">{{ user }}</a></td>
+                <td>$12.0</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock main %}

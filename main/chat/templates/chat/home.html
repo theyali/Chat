@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% block css_files %}{% endblock css_files %}
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://kit.fontawesome.com/a827418904.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'chat/css/style.css' %} ">
+    <title></title>
+</head>
+<body>
+    
+    {% include 'header.html' %}
+
+<div class="container">
+    <div class="row text-center home_row flex-row">
+        <div class="col-sm-2 m-auto">
+            {% if request.user.is_authenticated %}
+                <!-- User is authenticated, do nothing -->
+            {% else %}
+                <div class="field text-center">
+                    <a href="{% url 'login' %}" class="btn-main btn">Войти</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-8">
+            <img src="{% static 'chat/img/banner.png' %}" class="main_img"alt="">
+        </div>
+        <div class="col-sm-2 m-auto">
+            {% if request.user.is_authenticated %}
+            
+            {% else %}
+            <div class="field">
+                <h5 class="display-6">Создай свой аккаунт сейчас!</h5>
+            </div>
+            <a href="{% url 'register' %}" class="btn-main btn">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="delimeter">
+</div>
+<div class="container">
+    <div class="row text-center home_row">
+        <div class="col-sm-12">
+            <h1 class="display-2" >Ecstasy Video-Roulette</h1>
+            <p class="m-auto">
+                Добро пожаловать на наш сайт с онлайн играми, где вы можете заработать реальные деньги! <br>
+                Наши игры происходят в режиме реального времени, 
+                где вы можете выбрать игру и начать играть. <br>
+                В нашей системе случайно выбирается соперник для вас, как в чат рулетке. 
+                Вы будете видеть видео вашего соперника, и вы сможете общаться с ним по ходу игры.
+                <br>Наши игры очень просты в использовании, и вы можете делать ставки во время игры. 
+                Выберите свою ставку, и играйте на реальные деньги! Мы предлагаем большой выбор игр, 
+                чтобы удовлетворить потребности всех наших пользователей.
+                 Не упустите свой шанс заработать реальные деньги в наших онлайн играх уже сегодня!
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'chat/js/jquery.min.js' %}"></script>
+<script src="{% static 'chat/js/popper.js' %}"></script>
+<script src="{% static 'chat/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'chat/js/main.js' %}"></script>
+</body>
+</html>
+
+
+
+

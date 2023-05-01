@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}Profile{% endblock page_title %}
+
+{% block main %}
+
+<div class="wrapper">
+    <div class="title">Личные данные</div>
+    <form action="" method="POST">
+        {% csrf_token %}
+      <div class="field">
+        <input type="submit" value="Сохранить">
+      </div>
+    </form>
+</div>
+
+{% endblock main %}
+
+
+

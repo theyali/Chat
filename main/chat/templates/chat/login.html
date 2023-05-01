@@ -1,0 +1,40 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+{% endblock css_files %}
+
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+
+
+
+{% block main %}
+
+<div class="wrapper">
+    <div class="title">Вход</div>
+    <form action="" method="POST">
+        {% csrf_token %}
+      <div class="field">
+        <input type="text" name='email' required>
+        <label>Электронная почта</label>
+      </div>
+      <div class="field">
+        <input type="password" name='password' required>
+        <label>Пароль</label>
+      </div>
+      <div class="content">
+        <div class="pass-link"><a href="#">Забыли пароль?</a></div>
+      </div>
+      <div class="field">
+        <input type="submit" value="Войти">
+      </div>
+      <div class="signup-link">Нет аккаунта? <a href="{% url 'register' %}">Создать</a></div>
+    </form>
+</div>
+
+
+{% endblock main %}

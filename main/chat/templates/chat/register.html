@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+{% endblock css_files %}
+{% block main %}
+
+<div class="wrapper">
+    <div class="title">Регистрация</div>
+    <form action="" method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="field">
+            {{ field }}
+            {{ field.label_tag }}
+        </div>
+        {% endfor %}
+      <div class="field">
+        <input type="submit" value="Регистрация">
+      </div>
+      <a href="{% url 'login' %}">Назад</a>
+    </form>
+</div>
+
+
+{% endblock main %}

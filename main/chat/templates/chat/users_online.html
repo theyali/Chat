@@ -1,0 +1,33 @@
+{% extends 'main.html' %}
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}Users Online{% endblock page_title %}
+
+{% block main %}
+
+
+
+
+<table class="table">
+  <thead class="thead-dark">
+      <tr>
+          <th scope="col">№</th>
+          <th scope="col">Username</th>
+      </tr>
+  </thead>
+  <tbody>
+      {% for user in online_users %}
+          <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td><a href="{% url 'user_profile' user.username %}">{{ user.username }}</a></td>
+          </tr>
+      {% endfor %}
+  </tbody>
+</table>
+
+{% endblock main %}
+
+
