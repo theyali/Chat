@@ -14,27 +14,52 @@
 
 {% block main %}
 
-<div class="wrapper">
-    <div class="title">Вход</div>
-    <form action="" method="POST">
-        {% csrf_token %}
-      <div class="field">
-        <input type="text" name='email' required>
-        <label>Электронная почта</label>
-      </div>
-      <div class="field">
-        <input type="password" name='password' required>
-        <label>Пароль</label>
-      </div>
-      <div class="content">
-        <div class="pass-link"><a href="#">Забыли пароль?</a></div>
-      </div>
-      <div class="field">
-        <input type="submit" value="Войти">
-      </div>
-      <div class="signup-link">Нет аккаунта? <a href="{% url 'register' %}">Создать</a></div>
-    </form>
-</div>
+   <!-- Normal Breadcrumb Begin -->
+   <section class="normal-breadcrumb set-bg" data-setbg="{% static 'chat/img/normal-breadcrumb.jpg' %} ">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="normal__breadcrumb__text">
+                    <h2>Вход</h2>
+                    <p>Добро пожаловать на сайт</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Normal Breadcrumb End -->
+
+<!-- Login Section Begin -->
+<section class="login spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login__form">
+                    <h3>Вход</h3>
+                    <form action="" method='POST'>
+                        {% csrf_token %}
+                        <div class="input__item">
+                            <input type="text" placeholder="Почта" name='email'>
+                            <span class="icon_mail"></span>
+                        </div>
+                        <div class="input__item">
+                            <input type="password" placeholder="Пароль" name='password'>
+                            <span class="icon_lock"></span>
+                        </div>
+                        <button type="submit" class="site-btn">Войти</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="login__register">
+                    <h3>Нет аккаунта?</h3>
+                    <a href="{% url 'register' %}" class="primary-btn">Регистрация</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Login Section End -->
 
 
 {% endblock main %}

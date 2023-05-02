@@ -1,100 +1,63 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zxx">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Anime Template">
+    <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ecstasy Video</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{% static 'chat/css/font-awesome.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/elegant-icons.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/plyr.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/nice-select.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/owl.carousel.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/slicknav.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/style.css' %} " type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    {% block css_files %}{% endblock css_files %}
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://kit.fontawesome.com/a827418904.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'chat/css/style.css' %} ">
-    <title></title>
 </head>
+
 <body>
-    
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
     {% include 'header.html' %}
 
 
-{% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'error' %}
-            <div class="alert alert-danger mt-4 m-auto" style="width:50%;">
-                <ul class="messages">
-                    <li class="{{ message.tags }}">{{ message }}</li>
-                </ul>
-            </div>
-        {% elif message.tags == 'success' %}
-            <div class="alert alert-success mt-4 m-auto" style="width:50%;">
-                <ul class="messages">
-                    <li class="{{ message.tags }}">{{ message }}</li>
-                </ul>
-            </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
-
-
-        <div class="content container m-auto">
-                {% block home_block %}
-                
-                {% endblock home_block %}
-            <div class="row">
-                <div class="col-sm-2">
-                    <div class="container">
-                        {% if request.user.is_authenticated %}
-
-                        <ul class='side_bar'>
-                            <li><a href="{% url 'home' %}">Главная</a></li>
-                            <li><a href="{% url 'games' %}">Игры</a></li>
-                            <li>
-                                <a href="{% url 'profile' %}">Профиль</a>
-                                <li><a href="{% url 'referrals' %}">Мои рефералы</a></li>
-                                <li><a href="{% url 'wallet_history' %}">Мой кошелек</a></li>
-                                <li><a href="{% url 'donate' %}">Пополнить счет</a></li>
-                                <li><a href="">История ставок</a></li>
-   
-                            </li>
-                            <li><a href="">Настройки</a></li>
-                            <li><a href="">Тех поддержка</a></li>
-
-                        </ul>
-                        <style>
-                            .wrapper ul.side_bar {
-                                list-style: none;
-                                text-decoration: none;
-                                font-size: 20px;
-                                padding:0;
-                              }
-                            ul.side_bar a{
-                                text-decoration:none;
-                            }
-                        </style>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-sm-7">
-                    {% block main %}
-
-                    {% endblock main %}
-                </div>
-                <div class="col-sm-3">
-                    {% if request.user.is_authenticated %}
-                    <p><i class="fa-solid fa-circle fa-2xs" style="color: #02e306;"></i> 
-                        <a href="{% url 'users_online' %}">Пользователи онлайн</a>:{% block user_count %}{% endblock user_count %}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-
+    {% block main %}
     
-    <script src="{% static 'chat/js/jquery.min.js' %}"></script>
-    <script src="{% static 'chat/js/popper.js' %}"></script>
-    <script src="{% static 'chat/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'chat/js/main.js' %}"></script>
+    
+    {% endblock main %}
+
+
+
+
+
+    {% include 'footer.html' %}
+
+    <!-- Js Plugins -->
+    <script src="{% static 'chat/js/jquery-3.3.1.min.js' %} "></script>
+    <script src="{% static 'chat/js/bootstrap.min.js' %} "></script>
+    <script src="{% static 'chat/js/player.js' %} "></script>
+    <script src="{% static 'chat/js/jquery.nice-select.min.js' %} "></script>
+    <script src="{% static 'chat/js/mixitup.min.js' %} "></script>
+    <script src="{% static 'chat/js/jquery.slicknav.js' %} "></script>
+    <script src="{% static 'chat/js/owl.carousel.min.js' %} "></script>
+    <script src="{% static 'chat/js/main.js' %} "></script>
+
+
 </body>
+
 </html>
