@@ -1,3 +1,10 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+{% endblock css_files %}
+{% block main %}
+
 <div class="wrapper">
     <div class="title">Регистрация</div>
     <form action="" method="POST">
@@ -14,3 +21,6 @@
       <a href="{% url 'login' %}">Назад</a>
     </form>
 </div>
+
+
+{% endblock main %}
