@@ -8,6 +8,14 @@ class MyUserCreationForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
+        widgets = {
+            'email': forms.EmailInput(attrs={'placeholder': 'Email address'}),
+            'password1': forms.PasswordInput(attrs={'placeholder': 'Password'}),
+            'password2': forms.PasswordInput(attrs={'placeholder': 'Confirm your Password'}),
+            'username': forms.TextInput(attrs={'placeholder': 'Username'}),
+        }
+        
+
 class WithdrawalForm(forms.Form):
     amount = forms.DecimalField(max_digits=4, decimal_places=2, min_value=0.01, help_text='Amount to withdraw')
     paypal_email = forms.EmailField(help_text='Your PayPal email address')

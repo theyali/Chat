@@ -29,21 +29,22 @@
                       <div class="login__form">
                           <h3>Регистрация</h3>
                           <form action="" method="POST">
+                            {% csrf_token %}
                               <div class="input__item">
-                                  <input type="text" placeholder="Email address">
-                                  <span class="icon_mail"></span>
+                                    {{ form.email }}
+                                    <span class="icon_mail"></span>
                               </div>
                               <div class="input__item">
-                                  <input type="text" placeholder="Your Name">
+                                  {{ form.username }}
                                   <span class="icon_profile"></span>
                               </div>
                               <div class="input__item">
-                                  <input type="text" placeholder="Password">
+                                  {{ form.password1 }}
                                   <span class="icon_lock"></span>
                               </div>
                               <button type="submit" class="site-btn">Регистрация</button>
                           </form>
-                          <h5>Есть аккаунт? <a href="{% url 'login' %}">Войти</a></h5>
+                          <h5>Есть аккаунт? <a href="{% url 'login' %}">Войти</a></h5>                                  
                       </div>
                   </div>
                   <div class="col-lg-6">
