@@ -7,7 +7,7 @@
 
 {% block main %}
 
-<div class="wrapper">
+<div class="wrappper">
     <div class="title" style="margin-bottom:5%;">Пополнение счета</div>
 
     <form action="" method="POST">
@@ -15,16 +15,37 @@
         {% for field in form %}
             <div class="field">
                 {{ field }}
-                {{ field.label_tag }}
+                <label>Amount</label>
             </div>
         
         {% endfor %}
-        <div class="field">
-            <input type="submit" value="Пополнить баланс">
+        <div class="fieeeld text-center mt-4">
+            <button type="submit" class="site-btn">Пополнить баланс</button>
+
         </div>
     </form>
 
 </div>
-
+<script>
+    window.addEventListener("load", function() {
+        // Get all input fields
+        var inputFields = document.getElementsByTagName("input");
+        
+        // Attach event listener to each input field
+        for (var i = 0; i < inputFields.length; i++) {
+            inputFields[i].addEventListener("input", function() {
+                // Get the corresponding label element
+                var label = this.parentNode.querySelector("label");
+                
+                // Hide the label if the input has some text, else show it
+                if (this.value.length > 0) {
+                    label.style.display = "none";
+                } else {
+                    label.style.display = "block";
+                }
+            });
+        }
+    });
+</script>
 
 {% endblock main %}

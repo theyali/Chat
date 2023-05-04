@@ -1,14 +1,60 @@
-{% extends 'main.html' %}
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="zxx">
 
-{% block main %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Anime Template">
+    <meta name="keywords" content="Anime, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ecstasy Video</title>
 
-   <!-- Page Preloder -->
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
 
-<!-- Hero Section Begin -->
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{% static 'chat/css/font-awesome.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/elegant-icons.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/plyr.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/nice-select.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/owl.carousel.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/slicknav.min.css' %} " type="text/css">
+    <link rel="stylesheet" href="{% static 'chat/css/style.css' %} " type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://kit.fontawesome.com/a827418904.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+    {% include 'header.html' %}
+
+    
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <div class="alert alert-danger mt-4 m-auto">
+                <ul class="messages">
+                        {{ form.errors }}
+                        <li>{{ message }}</li>
+                </ul>
+            </div>
+        {% elif message.tags == 'success' %}
+            <div class="alert alert-success mt-4 m-auto">
+                <ul class="messages">
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <section class="hero">
     <div class="container">
         <div class="hero__slider owl-carousel">
@@ -617,5 +663,19 @@
 
 
 
+    {% include 'footer.html' %}
 
-{% endblock main %}
+    <!-- Js Plugins -->
+    <script src="{% static 'chat/js/jquery-3.3.1.min.js' %} "></script>
+    <script src="{% static 'chat/js/bootstrap.min.js' %} "></script>
+    <script src="{% static 'chat/js/player.js' %} "></script>
+    <script src="{% static 'chat/js/jquery.nice-select.min.js' %} "></script>
+    <script src="{% static 'chat/js/mixitup.min.js' %} "></script>
+    <script src="{% static 'chat/js/jquery.slicknav.js' %} "></script>
+    <script src="{% static 'chat/js/owl.carousel.min.js' %} "></script>
+    <script src="{% static 'chat/js/main.js' %} "></script>
+
+
+</body>
+
+</html>

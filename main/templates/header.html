@@ -13,21 +13,40 @@
                 <div class="header__nav">
                     <nav class="header__menu mobile-menu">
                         <ul>
-                            <li class="active"><a href="{% url 'home' %}">Главная страница</a></li>
-                            <li><a href="./categories.html">Стань участником <span class="arrow_carrot-down"></span></a>
-                                <ul class="dropdown">
-                                    <li><a href="{% url 'register' %}">Регистарция</a></li>
-                                    <li><a href="{% url 'login' %}">Войти</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./blog.html">О нас</a></li>
-                            <li><a href="#">Контакты</a></li>
+                            <li{% if request.path == '/' %} class="active"{% endif %}><a href="{% url 'home' %}">Главная страница</a></li>
+                            {% if request.user.is_authenticated %}
+                                <li{% if request.path == '/profile/' %} class="active"{% endif %}><a href="{% url 'profile' %}">Профиль</a></li>
+                                <li{% if request.path == '/games/' %} class="active"{% endif %}><a href="{% url 'games' %}">Игры</a></li>
+                            {% else %}
+                                <li><a href="./categories.html">Стань участником <span class="arrow_carrot-down"></span></a>
+                                    <ul class="dropdown">
+                                        <li{% if request.path == '/register/' %} class="active"{% endif %}><a href="{% url 'register' %}">Регистарция</a></li>
+                                        <li{% if request.path == '/login/' %} class="active"{% endif %}><a href="{% url 'login' %}">Войти</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+                            <li{% if request.path == '/blog/' %} class="active"{% endif %}><a href="./blog.html">О нас</a></li>
+                            <li{% if request.path == '/contact/' %} class="active"{% endif %}><a href="#">Контакты</a></li>
                         </ul>
                     </nav>
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="header__right">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'donate' %}" class="balance"><span class=" btn btn-light btn-sm">Баланс: {{ balance }}</span></a>
+                    {% endif %}
+                    <style>
+                        .balance{
+                            margin-right: 5%;
+                        }
+                    </style>
+
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'logout' %}"><img src="{% static 'chat/img/log-out.png' %}" width='20' alt="Log out"></a>
+                    {% else %}
+                        <a href="{% url 'login' %}"><img src="{% static 'chat/img/log-in.png' %}" width='20' alt="Log in"></a>
+                    {% endif %}
                     <a href="{% url 'login' %}"><span class="icon_profile"></span></a>
                 </div>
             </div>

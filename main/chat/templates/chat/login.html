@@ -10,12 +10,8 @@
 {% endblock user_count %}
 
 
-
-
-{% block main %}
-
-   <!-- Normal Breadcrumb Begin -->
-   <section class="normal-breadcrumb set-bg" data-setbg="{% static 'chat/img/normal-breadcrumb.jpg' %} ">
+{% block header_section %}
+<section class="normal-breadcrumb set-bg" data-setbg="{% static 'chat/img/normal-breadcrumb.jpg' %} ">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
@@ -27,6 +23,12 @@
         </div>
     </div>
 </section>
+{% endblock header_section %}
+
+{% block main %}
+
+   <!-- Normal Breadcrumb Begin -->
+
 <!-- Normal Breadcrumb End -->
 
 <!-- Login Section Begin -->

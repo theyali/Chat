@@ -2,11 +2,25 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from django import forms
+from django.contrib.auth import get_user_model
 
 class MyUserCreationForm(UserCreationForm):
+
+    password1 = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'})
+    )
+    password2 = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password'}),
+        strip=False,
+        help_text="Enter the same password as before, for verification."
+    )
+
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        model = get_user_model()
+        fields = ['username', 'email']
 
         widgets = {
             'email': forms.EmailInput(attrs={'placeholder': 'Email address'}),
@@ -14,6 +28,8 @@ class MyUserCreationForm(UserCreationForm):
             'password2': forms.PasswordInput(attrs={'placeholder': 'Confirm your Password'}),
             'username': forms.TextInput(attrs={'placeholder': 'Username'}),
         }
+
+    
         
 
 class WithdrawalForm(forms.Form):

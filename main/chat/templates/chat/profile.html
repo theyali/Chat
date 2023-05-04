@@ -10,13 +10,14 @@
 {% block main %}
 
 <div class="container content text-center main_container">
+  <div class="wrappper">
     <div class="title">Личные данные</div>
     <form action="" method="POST">
         {% csrf_token %}
-      <div class="field">
-        <input type="submit" value="Сохранить">
-      </div>
+        <button type="submit" value="Сохранить" class="site-btn">Сохранить</button>
     </form>
+  </div>
+
 </div>
 
 {% endblock main %}
