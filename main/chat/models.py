@@ -23,21 +23,15 @@ class User(AbstractUser):
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_online = models.BooleanField(default=False)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     bio = models.TextField(max_length=150, blank=True, null=True)
     referal_code = models.CharField(max_length=12, blank=True)
     recomended_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='ref_by')
-    # add more fields as needed
+    is_searching_game = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
-
-    def save(self, *args, **kwargs):
-        if self.referal_code == "":
-            code = generate_ref_code()
-            self.referal_code = code
-        super().save(*args, **kwargs)
-        Wallet.objects.create(user_profile=self, wallet_number=str(uuid.uuid4()))
     
 class Wallet(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
@@ -49,6 +43,7 @@ class Wallet(models.Model):
     
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     status = models.CharField(max_length=10, choices=[('pending', 'Ожидает'), ('completed', 'Выполнено'), ('failed', 'Не выполнено')])
     created_at = models.DateTimeField(auto_now_add=True)
@@ -56,3 +51,15 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f'Transaction #{self.id} ({self.user.username}): {self.amount}'
+
+    
+class Game(models.Model):
+    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
+    player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE, null=True, blank=True)
+    start_time = models.DateTimeField(auto_now_add=True)
+    is_searching = models.BooleanField(default=True)
+
+    # Добавьте другие поля, которые необходимы для вашей игры
+
+    def __str__(self):
+        return f"Game ({self.player1} vs {self.player2})"

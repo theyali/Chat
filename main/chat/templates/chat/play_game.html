@@ -1,0 +1,94 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block main %}
+
+<div class="container main_container">
+    <div id="game-container">
+      <div class="row">
+        <div class="col-sm">
+          <img class="play_game_user_image"  src="{% static 'chat/img/user.png' %}" alt="">
+        </div>
+        <div class="col-sm-6">
+          <div id="game-message">
+
+          </div>
+        </div>
+        <div class="col-sm">
+          <img class="play_game_user_image" src="{% static 'chat/img/user.png' %}" alt="">
+        </div>
+      </div>
+          
+          <!-- Добавьте сюда содержимое вашей игры -->
+    </div>
+    
+
+<style>
+      
+      .waveBtn {
+        background: transparent;
+        height: 22px;
+        width: 55px;
+        border-radius: 9999rem;
+        border: 1px solid #4963E3;
+        position: relative;
+        overflow: hidden;
+        transform: scale(3);
+        margin-left: 30%;
+        margin-top: 20%;
+      }
+      
+      .waveImg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      
+      .wave {
+        animation: moveTheWave 3400ms linear infinite;
+        stroke-dasharray: 0 16 101 16;
+      }
+      
+      @keyframes moveTheWave {
+        0% {
+          stroke-dashoffset: -3;
+          transform: translate3d(0, 0, 0);
+        }
+      
+        100% {
+          stroke-dashoffset: -138;
+          transform: translate3d(-90px, 0, 0);
+        }
+      }
+</style>
+</div>
+
+
+<script>
+  function updateGame() {
+    $.ajax({
+      url: "{% url 'game_state' %}",
+      type: "GET",
+      dataType: "json",
+      success: function(data) {
+        if (data.is_searching) {
+          // Показать сообщение или выполнить другие действия
+          var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
+          var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
+          $("#game-message").html(buttonHtml);
+        } else {
+          // Обработка случая, когда игра найдена
+          // Обновить интерфейс игры с использованием данных, например:
+          window.location.href = "{% url 'chat_game' %}";
+        }
+      }
+    });
+  }
+  
+  setInterval(updateGame, 1000); // Вызов функции updateGame каждую секунду
+</script>
+
+{% endblock main %}
+
+

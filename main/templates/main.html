@@ -62,7 +62,7 @@
     <div class="row">
         {% if request.user.is_authenticated %}
 
-        <div class="col-sm-4 mt-4">
+        <div class="col-sm-2 mt-4">
             
             <ul class='side_bar'>
                 <div class="side_col text-center">
@@ -91,8 +91,43 @@
                 <hr>
                 <div class="side_col text-center">
                     <li><a href="">Тех поддержка</a></li>
-                </div>  
+                </div>
+                <hr>
+                <div class="side_col text-center">
+                    <p>
+                        <a style="display: inline-block;" href="{% url 'users_online' %}">
+                            Онлайн: <span id="user-count"></span>
+                        </a>
+                        <i class="fa-solid fa-circle fa-2xs" style="color: #02e306;"></i>
+                    </p>
+                </div> 
             </ul>
+
+            <script>
+                var prevUserCount = 0;
+            
+                function updateUserCount() {
+                    $.ajax({
+                        url: '{% url "users_count" %}',
+                        dataType: 'json',
+                        success: function(data) {
+                            var userCount = data.user_count;
+                            if (userCount != prevUserCount) {
+                                $('#user-count').text(userCount);
+                                prevUserCount = userCount;
+                            }
+                        }
+                    });
+                }
+            
+                $(document).ready(function() {
+                    updateUserCount();
+                    // Обновление каждые 10 секунд
+                    setInterval(updateUserCount, 10000);
+                });
+            </script>
+
+
             <style>
                 .wrapper ul.side_bar {
                     list-style: none;
@@ -112,11 +147,6 @@
             {% block main %}
             {% endblock main %}
         </div>
-        {% if request.user.is_authenticated %}
-        <div class="col-sm">
-            
-        </div>
-        {% endif %}
     </div>
 </div>
 

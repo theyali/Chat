@@ -1,9 +1,9 @@
 import json
-from django.conf import settings
-from django.shortcuts import render, redirect
+import uuid
+from django.shortcuts import render, redirect,  get_object_or_404 
 from django.contrib import messages
-from .utils import DecimalEncoder
-from .models import User, UserProfile, Wallet, Transaction
+from .utils import DecimalEncoder, generate_ref_code
+from .models import User, UserProfile, Wallet, Transaction, Game
 from django.contrib.auth import authenticate, login, logout
 from .forms import MyUserCreationForm, DepositForm
 from django.core.mail import send_mail
@@ -11,9 +11,8 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.views.generic import View
-from paypalrestsdk import Payment
-import paypalrestsdk
+from django.http import JsonResponse
+from django.db.models import Q
 
 # paypalrestsdk.configure({
 #   "mode": "sandbox", # Режим Sandbox для тестирования
@@ -38,16 +37,12 @@ def get_online_users():
 
 
 def get_common_context(request):
-    online_users = get_online_users() # your function to get online users
-    users_count = len(online_users)
     try:
         wallet = request.wallet
         balance = wallet.balance
     except:
         balance = ''
     return {
-        'online_users': online_users,
-        'user_count': users_count,
         'balance': balance,
     }
 
@@ -71,33 +66,30 @@ def profile(request):
     return render(request, 'chat/profile.html', context=context)
 
 def login_user(request):
-    user_count = len(get_online_users()) # your function to get user count
-    context = {
-        'user_count': user_count,
-    }
     if request.method == "POST":
         email = request.POST.get('email').lower()
         password = request.POST.get('password')
-        try:
-            user = User.objects.get(email=email)
-        except:
-            messages.error(request, "Аккаунт не найден")
-
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            user_profile = UserProfile.objects.get(user=request.user)
-            wallet = Wallet.objects.get(user_profile=user_profile)
+            user_profile = get_object_or_404(UserProfile, user=user)
+            user_profile.is_online = True
+            user_profile.save()
+            wallet = get_object_or_404(Wallet, user_profile=user_profile)
             request.session['wallet_id'] = wallet.id
             return redirect("profile")
         else:
             messages.error(request, "Почта или пароль неверны")
-    context={}
-    return render(request, 'chat/login.html', context)
+    return render(request, 'chat/login.html', {})
 
+@login_required
 def logout_user(request):
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    user_profile.is_online = False
+    user_profile.save()
     logout(request)
     return redirect('home')
+
 
 def register_user(request):
     form = MyUserCreationForm()
@@ -118,6 +110,10 @@ def register_user(request):
             except:
                 user_profile = UserProfile(user=user)
                 user_profile.save()
+            user_profile = UserProfile.objects.select_for_update().get(user=user)
+            user_profile.referal_code = generate_ref_code()
+            user_profile.save() 
+            Wallet.objects.create(user_profile=user_profile, wallet_number=str(uuid.uuid4()))
             # Send the confirmation email
             subject = 'Confirm your email address'
             message = f'Your confirmation code is {confirmation_code}'
@@ -191,6 +187,15 @@ def donate(request):
             # Store the amount in the session
             json_data = json.dumps(amount, cls=DecimalEncoder)
             request.session['donation_amount'] = json_data
+            # Create a new transaction
+            transaction = Transaction.objects.create(
+                user=request.user,
+                amount=amount,
+                status='pending',
+                created_at=timezone.now(),
+                updated_at=timezone.now()
+            )
+            transaction.save()
             # Process the donation with the given amount
             # Redirect to a success page or display a success message
             return redirect('proceed_donate')
@@ -220,11 +225,69 @@ def games(request):
 def payment_failed(request):
     context = get_common_context(request)
     return render(request, 'chat/payment_failed.html', context=context)
+
 @login_required
 def payment_success(request):
-    amount = request.session['donation_amount']
-    context = get_common_context(request)
-    transaction = Transaction.objects.create(user=request.user, amount=amount, status='completed', created_at=timezone.now(), updated_at=timezone.now())
-    transaction.save()
+    amount = request.session.get('donation_amount')
+    if not amount:
+        return redirect('donate')
+    with transaction.atomic():
+        transaction = Transaction.objects.select_for_update().get(user=request.user, amount=amount, status='pending')
+        transaction.status = 'completed'
+        transaction.save()
+        user_profile = UserProfile.objects.get(user=request.user)
+        wallet = Wallet.objects.select_for_update().get(user_profile=user_profile)
+        wallet.balance += amount
+        wallet.save()
     del request.session['donation_amount']
+    context = get_common_context(request)
+    context['amount'] = amount
     return render(request, 'chat/payment_success.html', context=context)
+
+
+
+@login_required
+def users_count(request):
+    online_users = User.objects.filter(userprofile__is_online=True)
+    user_count = online_users.count()
+    data = {'user_count': user_count}
+    return JsonResponse(data)
+
+@login_required
+def play_game(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    user_profile.is_searching_game = True
+    user_profile.save()
+
+    game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
+    if not game:
+        other_profiles = UserProfile.objects.filter(is_searching_game=True).exclude(user=user)
+        if other_profiles.exists():
+            # Нашли других игроков - создаем игру
+            other_profile = other_profiles.first()
+            game = Game.objects.create(player1=user_profile.user, player2=other_profile.user, is_searching=False)
+            user_profile.is_searching_game = False
+            user_profile.save()
+            other_profile.is_searching_game = False
+            other_profile.save()
+    return render(request ,'chat/play_game.html')
+
+@login_required
+def game_state(request):
+    # Проверяем, есть ли текущий пользователь в игре
+    game = Game.objects.filter(Q(player1=request.user) | Q(player2=request.user)).first()
+    
+    if game:
+        return JsonResponse({
+                    "is_searching": game.is_searching,
+                    "player1": request.user.username,
+                    "player2": ""
+                })
+    else:
+        return JsonResponse({
+            "is_searching": True,
+        })
+@login_required
+def chat_game(request):
+    return render(request ,'chat/chat_game.html')
