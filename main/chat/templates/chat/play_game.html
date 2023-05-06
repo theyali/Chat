@@ -76,9 +76,11 @@
   };
   
   gameSocket.onmessage = function (e) {
-    console.log("Received message:", e.data);
     const data = JSON.parse(e.data);
-    
+  
+    // Log the received data to the console
+    console.log("Received data:", data);
+  
     if (data.type === "connection established") {
       console.log("Connection established:", data.message);
     } 
@@ -86,26 +88,19 @@
       // Handle the player disconnection event
       let playerUsername = data.player_username;
       console.log("Player disconnected:", playerUsername);
-      
+  
       // Perform any necessary actions, such as updating the UI or game state
     }
-    
     else if (data.type === "game_state") {
       console.log("Game state:", data);
-      if (!data.is_searching) {
+      if (data.is_searching === false) {
         window.location.href = "{% url 'chat_game' %}";  // Replace 'chat_game' with your actual URL name
       }
       else{
-        var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
         var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
         $("#game-message").html(buttonHtml);
       }
     }
-  };
-  
-  gameSocket.onclose = function (e) {
-    // Connection is closed
-    console.log("Connection closed");
   };
 </script>
 
