@@ -20,7 +20,6 @@ urlpatterns = [
     path('payment_failed/', views.payment_failed, name='payment_failed'),
     path('play_game/', views.play_game, name='play_game'),
     re_path('users_count/', views.users_count, name='users_count'),
-    re_path('game_state/', views.game_state, name='game_state'),
     re_path('chat_game/', views.chat_game, name='chat_game'),
 
 

@@ -43,7 +43,7 @@ class Wallet(models.Model):
     
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     status = models.CharField(max_length=10, choices=[('pending', 'Ожидает'), ('completed', 'Выполнено'), ('failed', 'Не выполнено')])
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,7 +54,7 @@ class Transaction(models.Model):
 
     
 class Game(models.Model):
-    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE)
+    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE, null=True, blank=True)
     player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE, null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
     is_searching = models.BooleanField(default=True)
