@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+path('', views.home, name='home'),
     path('<str:ref_code>', views.ref_home, name='home'),
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
@@ -20,7 +20,9 @@ urlpatterns = [
     path('payment_failed/', views.payment_failed, name='payment_failed'),
     path('play_game/', views.play_game, name='play_game'),
     re_path('users_count/', views.users_count, name='users_count'),
+    re_path('game_state/', views.game_state, name='game_state'),
     re_path('chat_game/', views.chat_game, name='chat_game'),
+
 
 
 

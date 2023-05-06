@@ -274,5 +274,21 @@ def play_game(request):
     return render(request ,'chat/play_game.html')
 
 @login_required
+def game_state(request):
+    # Проверяем, есть ли текущий пользователь в игре
+    game = Game.objects.filter(Q(player1=request.user) | Q(player2=request.user)).first()
+    
+    if game:
+        return JsonResponse({
+                    "is_searching": game.is_searching,
+                    "player1": request.user.username,
+                    "player2": ""
+                })
+    else:
+        return JsonResponse({
+            "is_searching": True,
+        })
+    
+@login_required
 def chat_game(request):
     return render(request ,'chat/chat_game.html')

@@ -54,7 +54,7 @@ class Transaction(models.Model):
 
     
 class Game(models.Model):
-    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE, null=True, blank=True)
+    player1 = models.ForeignKey(User, related_name='games_as_player1', on_delete=models.CASCADE, blank=True)
     player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE, null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
     is_searching = models.BooleanField(default=True)
