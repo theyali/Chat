@@ -20,8 +20,8 @@ path('', views.home, name='home'),
     path('payment_failed/', views.payment_failed, name='payment_failed'),
     path('play_game/', views.play_game, name='play_game'),
     re_path('users_count/', views.users_count, name='users_count'),
-    re_path('game_state/', views.game_state, name='game_state'),
-    re_path('chat_game/', views.chat_game, name='chat_game'),
+    path('chat_game/<int:pk>', views.chat_game, name='chat_game'),
+    path('check_game/', views.check_game, name='check_game'),  # новый url для проверки состояния игры
     path('update_player_status/', views.update_player_status, name='update_player_status'),
 
 

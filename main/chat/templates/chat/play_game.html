@@ -64,31 +64,31 @@
 </style>
 </div>
 
-
-<script type="text/javascript">
-  function updateGame() {
-    $.ajax({
-      url: "{% url 'game_state' %}",
-      type: "GET",
-      dataType: "json",
-      success: function(data) {
-        if (data.is_searching) {
-          // Показать сообщение или выполнить другие действия
-          var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
-          var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
-          $("#game-message").html(buttonHtml);
-        } else {
-          // Обработка случая, когда игра найдена
-          // Обновить интерфейс игры с использованием данных, например:
-          window.location.href = "{% url 'chat_game' %}";
-        }
-      }
-    });
-    
+<script>
+  // функция для обновления состояния игры
+  function updateGameStatus() {
+      fetch("{% url 'check_game' %}")
+          .then(response => response.json())
+          .then(data => {
+              if (data.game_id) {
+                  // Если игра найдена, перенаправляем на страницу игры
+                  // Замените 'your_base_url' на базовый URL вашего веб-сайта
+                  window.location.href = '/chat_game/' + data.game_id ;
+                } else {
+                var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
+                var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
+                $("#game-message").html(buttonHtml);
+                  // Иначе, обновляем состояние через 5 секунд
+                  setTimeout(updateGameStatus, 5000);
+              }
+          });
   }
   
-  setInterval(updateGame, 1000); // Вызов функции updateGame каждую секунду 
-</script>
+  // запускаем обновление состояния игры
+  updateGameStatus();
+  </script>
+  
+
 
 {% endblock main %}
 

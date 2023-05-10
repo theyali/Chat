@@ -278,33 +278,28 @@ def play_game(request):
             user_profile.save()
             other_profile.is_searching_game = False
             other_profile.save()
-    return render(request ,'chat/play_game.html', context=context)
+    if game:
+        # Если игра найдена, перенаправляем пользователя на страницу игры
+        return redirect('chat_game', pk=game.id)
+    else:
+        # Если игра не найдена, отображаем страницу поиска
+        return render(request ,'chat/play_game.html', context=context)
 
 @login_required
-def game_state(request):
-    # Проверяем, есть ли текущий пользователь в игре
-    game = Game.objects.filter(Q(player1=request.user) | Q(player2=request.user)).first()
-    
+def check_game(request):
+    user = request.user
+    game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
     if game:
-        return JsonResponse({
-                    "is_searching": game.is_searching,
-                    "player1": request.user.username,
-                    "player2": ""
-                })
+        return JsonResponse({'game_id': game.id})
     else:
-        return JsonResponse({
-            "is_searching": True,
-        })
-    
+        return JsonResponse({'game_id': None})
+
+
 @login_required
-def chat_game(request):
-    user_id = User.objects.get(id=request.user.id).id
-    game = Game.objects.filter(Q(player1=request.user) | Q(player2=request.user)).first()
+def chat_game(request, pk):
+    game = Game.objects.filter(pk=pk).first()
     context = {
-        'player_id':user_id,
-        'player_1':game.player1,
-        'player_2':game.player2,
-        'game_id':game.id
+        'game':game
     }
     return render(request ,'chat/chat_game.html', context=context)
 

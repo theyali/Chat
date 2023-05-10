@@ -11,7 +11,7 @@
 
           </div>
           <div class="col-sm-6">
-
+            {{ game.id }}
           </div>
       </div>
   </div>
@@ -19,36 +19,25 @@
 
 
 <script>
-    var player_id = "{{ player_id }}";
-    var game_id = "{{ game_id }}"
-    window.addEventListener('beforeunload', function() {
-        // Отправка AJAX-запроса при покидании страницы
-        $.ajax({
-          url: '/update_player_status/',
-          method: 'POST',
-          data: {
-            'csrfmiddlewaretoken': '{{ csrf_token }}', // Добавьте эту строку для передачи CSRF-токена
-            'player_id': player_id,
-            'status': 'disconnected',
-            'game_id':game_id,
-          },
-          success: function(response) {
-            console.log("Hello")
-            // Обработка успешного ответа от сервера
-            // Добавление текста об уходе другого игрока
-            $('#game-container').append('<p>Игрок покинул игру.</p>');
+  var gameSocket = new WebSocket(
+      'ws://' + window.location.host +
+      '/ws/chat/' + {{game.id}}+ '/');
 
-            // Перенаправление на страницу поиска игры через 3 секунды
-            setTimeout(function() {
-                window.location.href = "{% url 'play_game' %}";  // Замените на ваш URL-адрес страницы поиска игры
-            }, 3000);
-        },
-          error: function(error) {
-            // Обработка ошибки
-          }
-        });
-    });
+  gameSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+
+  gameSocket.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      var message = data['message'];
+      if (message == 'Other player left the game.') {
+          // Redirect to the searching page
+          window.location.href = "{% url 'play_game' %}";
+      }
+  };
 </script>
+
+
 {% endblock main %}
 
 
