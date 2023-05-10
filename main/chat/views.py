@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Q
+from decimal import Decimal
+
 
 # paypalrestsdk.configure({
 #   "mode": "sandbox", # Режим Sandbox для тестирования
@@ -156,7 +158,7 @@ def user_profile(request, username):
 
 @login_required
 def wallet_history(request):
-    transactions = Transaction.objects.all()
+    transactions = Transaction.objects.filter(user = request.user)
     context = get_common_context(request)
     context.update({'transaction':transactions})
     return render(request, 'chat/wallet_history.html', context=context)
@@ -188,7 +190,7 @@ def donate(request):
             json_data = json.dumps(amount, cls=DecimalEncoder)
             request.session['donation_amount'] = json_data
             # Create a new transaction
-            transaction = Transaction.objects.create(
+            transaction = Transaction(
                 user=request.user,
                 amount=amount,
                 status='pending',
@@ -231,19 +233,19 @@ def payment_success(request):
     amount = request.session.get('donation_amount')
     if not amount:
         return redirect('donate')
-    with transaction.atomic():
-        transaction = Transaction.objects.select_for_update().get(user=request.user, amount=amount, status='pending')
-        transaction.status = 'completed'
-        transaction.save()
-        user_profile = UserProfile.objects.get(user=request.user)
-        wallet = Wallet.objects.select_for_update().get(user_profile=user_profile)
-        wallet.balance += amount
-        wallet.save()
+
+
+    user_profile = UserProfile.objects.get(user=request.user)
+    wallet = Wallet.objects.select_for_update().get(user_profile=user_profile)
+    wallet.balance += Decimal(amount)
+    wallet.save()
+    transaction = Transaction.objects.select_for_update().get(user=request.user, amount=amount, status='pending')
+    transaction.status = 'completed'
+    transaction.save()
     del request.session['donation_amount']
     context = get_common_context(request)
     context['amount'] = amount
     return render(request, 'chat/payment_success.html', context=context)
-
 
 
 @login_required
@@ -255,8 +257,13 @@ def users_count(request):
 
 @login_required
 def play_game(request):
+    context=get_common_context(request)
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
+    wallet = Wallet.objects.get(user_profile = user_profile)
+    if wallet.balance < 3:
+        messages.error(request, "У вас недостаточно баланса")
+        return redirect('proceed_donate')
     user_profile.is_searching_game = True
     user_profile.save()
 
@@ -271,7 +278,7 @@ def play_game(request):
             user_profile.save()
             other_profile.is_searching_game = False
             other_profile.save()
-    return render(request ,'chat/play_game.html')
+    return render(request ,'chat/play_game.html', context=context)
 
 @login_required
 def game_state(request):
@@ -291,4 +298,29 @@ def game_state(request):
     
 @login_required
 def chat_game(request):
-    return render(request ,'chat/chat_game.html')
+    user_id = User.objects.get(id=request.user.id).id
+    game = Game.objects.filter(Q(player1=request.user) | Q(player2=request.user)).first()
+    context = {
+        'player_id':user_id,
+        'player_1':game.player1,
+        'player_2':game.player2,
+        'game_id':game.id
+    }
+    return render(request ,'chat/chat_game.html', context=context)
+
+@login_required
+def update_player_status(request):
+    if request.method == 'POST':
+        player_id = request.POST.get('player_id')
+        status = request.POST.get('status')
+        game_id = request.POST.get('game_id')
+        game = Game.objects.get(id=game_id)
+        game.delete()
+        userProfile = UserProfile(user_id=player_id)
+        userProfile.is_searching_game = False
+        user_profile.save()
+        redirect('play_game')
+        # Обновление статуса игрока на сервере
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error'})

@@ -4,23 +4,51 @@
 {% block main %}
 
 <div class="container main_container">
-    <div id="game-container">
-          <h1>Игра</h1>
-          <div class="row">
-            <div class="col-sm">
-                {{ game.player1 }}
-            </div>
-            <div class="col-sm">
-                {{ game.player2 }}
-            </div>
+  <div id="game-container">
+      <h1>Игра</h1>
+      <div class="row text-center">
+          <div class="col-sm-6">
+
           </div>
-          
+          <div class="col-sm-6">
+
+          </div>
       </div>
-
-
+  </div>
 </div>
 
 
+<script>
+    var player_id = "{{ player_id }}";
+    var game_id = "{{ game_id }}"
+    window.addEventListener('beforeunload', function() {
+        // Отправка AJAX-запроса при покидании страницы
+        $.ajax({
+          url: '/update_player_status/',
+          method: 'POST',
+          data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}', // Добавьте эту строку для передачи CSRF-токена
+            'player_id': player_id,
+            'status': 'disconnected',
+            'game_id':game_id,
+          },
+          success: function(response) {
+            console.log("Hello")
+            // Обработка успешного ответа от сервера
+            // Добавление текста об уходе другого игрока
+            $('#game-container').append('<p>Игрок покинул игру.</p>');
+
+            // Перенаправление на страницу поиска игры через 3 секунды
+            setTimeout(function() {
+                window.location.href = "{% url 'play_game' %}";  // Замените на ваш URL-адрес страницы поиска игры
+            }, 3000);
+        },
+          error: function(error) {
+            // Обработка ошибки
+          }
+        });
+    });
+</script>
 {% endblock main %}
 
 

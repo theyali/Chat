@@ -2423,3 +2423,8 @@ ol {
 .play_game_user_image{
 	width: 70%;
 }
+
+.video_player {
+	width: 400px;
+	height: 480px;
+}

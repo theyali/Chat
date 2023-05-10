@@ -22,7 +22,7 @@ path('', views.home, name='home'),
     re_path('users_count/', views.users_count, name='users_count'),
     re_path('game_state/', views.game_state, name='game_state'),
     re_path('chat_game/', views.chat_game, name='chat_game'),
-
+    path('update_player_status/', views.update_player_status, name='update_player_status'),
 
 
 
