@@ -3,6 +3,7 @@ from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
 from .models import UserProfile, Game
 import json
+import random
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -65,4 +66,28 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message
+        }))
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        # Generate a random number and send it to all clients
+        if message == 'start_game':
+            random_number = random.randint(0, 9)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'spin_wheel',
+                    'number': random_number,
+                }
+            )
+
+
+    async def spin_wheel(self, event):
+        number = event['number']
+
+        # Send number to WebSocket
+        await self.send(text_data=json.dumps({
+            'number': number,
         }))

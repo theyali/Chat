@@ -1,4 +1,5 @@
 import json
+import time
 import uuid
 from django.shortcuts import render, redirect,  get_object_or_404 
 from django.contrib import messages
@@ -14,6 +15,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Q
 from decimal import Decimal
+from .utils import generateAgoraToken
 
 
 # paypalrestsdk.configure({
@@ -297,10 +299,10 @@ def check_game(request):
 
 @login_required
 def chat_game(request, pk):
+    context = get_common_context(request)
     game = Game.objects.filter(pk=pk).first()
-    context = {
-        'game':game
-    }
+    # Генерируем токены для каждого игрока
+    context['game']= game
     return render(request ,'chat/chat_game.html', context=context)
 
 @login_required
