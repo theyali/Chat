@@ -1,33 +1,20 @@
 {% extends 'main.html' %}
-
+{% load static %}
 
 {% block main %}
 
-<div class="wrapper">
-    <div class="row">
-        <div class="col-sm m-auto">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="..." alt="Random">
-                <div class="card-body">
-                  <h5 class="card-title">Random Wheel Chat Roulette</h5>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                  <a href="{% url 'play_game' %}" class="btn btn-primary">Go somewhere</a>
-                </div>
-              </div>
-        </div>
-        <div class="col-sm m-auto">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="..." alt="Random">
-                <div class="card-body">
-                  <h5 class="card-title">Random Wheel Chat Roulette</h5>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-              </div>
-        </div>
+<div class="wrapper m-auto">
+<div class="card m-auto" style="width: 18rem;">
+    <img class="card-img-top" src="{% static 'chat/img/game.png' %}" alt="Random">
+    <div class="card-body">
+      <h5 class="card-title">Random Wheel Roulette</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      <div>
+        <a href="{% url 'bet_game' %}" class="site-btn">Играть</a>
+      </div>
+      
     </div>
-
-
+  </div>
 </div>
 
 {% endblock main %}

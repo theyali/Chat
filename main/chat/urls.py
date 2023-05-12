@@ -19,6 +19,7 @@ path('', views.home, name='home'),
     path('payment_success/', views.payment_success, name='payment_success'),
     path('payment_failed/', views.payment_failed, name='payment_failed'),
     path('play_game/', views.play_game, name='play_game'),
+    path('bet_game/', views.bet_game, name='bet_game'),
     re_path('users_count/', views.users_count, name='users_count'),
     path('chat_game/<int:pk>', views.chat_game, name='chat_game'),
     path('check_game/', views.check_game, name='check_game'),  # новый url для проверки состояния игры

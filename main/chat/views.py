@@ -257,6 +257,11 @@ def users_count(request):
     data = {'user_count': user_count}
     return JsonResponse(data)
 
+
+def bet_game(request):
+    context = get_common_context(request)
+    return render(request, 'chat/bet_game.html', context=context)
+
 @login_required
 def play_game(request):
     context=get_common_context(request)

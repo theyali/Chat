@@ -58,7 +58,8 @@ class Game(models.Model):
     player2 = models.ForeignKey(User, related_name='games_as_player2', on_delete=models.CASCADE, null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
     is_searching = models.BooleanField(default=True)
-    
+    bet = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+
     def __str__(self):
         return f"Game ({self.player1} vs {self.player2})"
 

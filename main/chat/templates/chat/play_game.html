@@ -20,7 +20,7 @@
       </div>
           
           <!-- Добавьте сюда содержимое вашей игры -->
-    </div>
+</div>
     
 
 <style>
@@ -86,6 +86,14 @@
   
   // запускаем обновление состояния игры
   updateGameStatus();
+
+  let searchGameSocket = new WebSocket(
+    'ws://' + window.location.host + '/ws/search_game/'
+);
+
+window.onbeforeunload = function() {
+    searchGameSocket.close();
+};
   </script>
   
 

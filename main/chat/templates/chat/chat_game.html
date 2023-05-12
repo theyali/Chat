@@ -8,7 +8,13 @@
       <h1>Игра</h1>
         <p id="countdown">5</p>
         <section id="video-streams">
-
+          <div class="wrappper player1_div">
+            <div class="player1">{{ game.player1 }}</div>
+          </div>
+          <img class='vs_img' src="{% static 'chat/img/vs.png' %}" alt="">
+          <div class="wrappper player2_div">
+            <div class="player2">{{game.player2}}</div>
+          </div>
         </section>
         <div id="wheel">
           <div id="numbers">
@@ -24,10 +30,12 @@
               <img src="{% static 'chat/img/0.png' %}" alt="0">
               <!-- и так далее до 10 -->
           </div>
-      </div>
+        </div>
       
 
   </div>
+
+  
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>

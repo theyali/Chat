@@ -30,6 +30,7 @@
 
 /* Template default CSS
 /*----------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap');
 
 html,
 body {
@@ -454,6 +455,7 @@ ol {
 
 .main_container{
 	min-height: 100%;
+	margin-bottom: 10%;
 }
 .header__menu ul li a {
 	font-size: 15px;
@@ -2468,6 +2470,129 @@ ol {
 #video-streams{
 	min-width: 100%;
 	min-height: 50%;
-	background-color: #ffffff;
 	border-radius: 5%;
+	display: flex;
+	justify-content: space-between;
+}
+.player2_div{
+	min-height: 500px;
+}
+
+.vs_img{
+	width: 20%;
+	height: 20%;
+	margin-top: 10%;
+}
+
+.my_btn {
+	position: relative;
+	background: #444;
+	color: #fff;
+	text-decoration: none;
+	text-transform: uppercase;
+	width: 90%;
+	border: none;
+	letter-spacing: 0.1rem;
+	font-size: 1rem;
+	padding: 1rem 3rem;
+	transition: 0.2s;
+  }
+  
+  .my_btn:hover {
+	letter-spacing: 0.2rem;
+	padding: 1.1rem 3.1rem;
+	background: var(--clr);
+	color: var(--clr);
+	/* box-shadow: 0 0 35px var(--clr); */
+	animation: box 3s infinite;
+  }
+  
+  .my_btn::before {
+	content: "";
+	position: absolute;
+	inset: 2px;
+	background: #272822;
+  }
+  
+  .my_btn span {
+	position: relative;
+	z-index: 1;
+  }
+  .my_btn i {
+	position: absolute;
+	inset: 0;
+	display: block;
+  }
+  
+  .my_btn i::before {
+	content: "";
+	position: absolute;
+	width: 10px;
+	height: 2px;
+	left: 80%;
+	top: -2px;
+	border: 2px solid var(--clr);
+	background: #272822;
+	transition: 0.2s;
+  }
+  
+  .my_btn:hover i::before {
+	width: 15px;
+	left: 20%;
+	animation: move 3s infinite;
+  }
+  
+  .my_btn i::after {
+	content: "";
+	position: absolute;
+	width: 10px;
+	height: 2px;
+	left: 20%;
+	bottom: -2px;
+	border: 2px solid var(--clr);
+	background: #272822;
+	transition: 0.2s;
+  }
+  
+  .my_btn:hover i::after {
+	width: 15px;
+	left: 80%;
+	animation: move 3s infinite;
+  }
+  
+  @keyframes move {
+	0% {
+	  transform: translateX(0);
+	}
+	50% {
+	  transform: translateX(5px);
+	}
+	100% {
+	  transform: translateX(0);
+	}
+  }
+  
+  @keyframes box {
+	0% {
+	  box-shadow: #27272c;
+	}
+	50% {
+	  box-shadow: 0 0 25px var(--clr);
+	}
+	100% {
+	  box-shadow: #27272c;
+	}
+  }
+
+  .bet_row{
+	min-height: 200px;
+	margin-left: auto;
+	align-items: center;
+	justify-content: center;
+  }
+.headtitle{
+	font-size: 30px;
+	font-weight: bold;
+	color: white;
+	margin-bottom: 2%;
 }

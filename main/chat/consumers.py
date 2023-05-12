@@ -91,3 +91,19 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'number': number,
         }))
+
+
+class SearchGameConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # stop searching game when user leaves the page
+        await self.stop_searching_game(self.user)
+
+    @database_sync_to_async
+    def stop_searching_game(self, user):
+        profile = UserProfile.objects.get(user=user)
+        profile.is_searching_game = False
+        profile.save()
