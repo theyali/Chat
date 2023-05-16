@@ -1,10 +1,9 @@
 import json
-import time
 import uuid
 from django.shortcuts import render, redirect,  get_object_or_404 
 from django.contrib import messages
 from .utils import DecimalEncoder, generate_ref_code
-from .models import User, UserProfile, Wallet, Transaction, Game
+from .models import User, UserProfile, Wallet, Transaction, Game, Game_Bet
 from django.contrib.auth import authenticate, login, logout
 from .forms import MyUserCreationForm, DepositForm
 from django.core.mail import send_mail
@@ -15,7 +14,8 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Q
 from decimal import Decimal
-from .utils import generateAgoraToken
+from channels.db import database_sync_to_async
+from datetime import  timedelta
 
 
 # paypalrestsdk.configure({
@@ -257,47 +257,64 @@ def users_count(request):
     data = {'user_count': user_count}
     return JsonResponse(data)
 
-
+@login_required
 def bet_game(request):
     context = get_common_context(request)
+    if request.method == 'POST':
+        bet = Decimal(request.POST['bet'])
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        wallet = Wallet.objects.get(user_profile = user_profile)
+        if wallet.balance >= bet:
+            wallet.balance -= bet
+            wallet.save()
+
+            # Check if there is an existing game that is searching for a player with the same bet
+            game = Game.objects.filter(bet=bet, is_searching=True).exclude(player1=user).first()
+
+            if game:
+                # If such a game exists, add the current user as the second player
+                game.player2 = user
+                game.is_searching = False
+                game.save()
+            else:
+                # If no such game exists, create a new game with the current user as the first player
+                game = Game.objects.create(player1=user, bet=bet, is_searching=True)
+                user_profile.is_searching_game = True
+                user_profile.save()
+                gameBet = Game_Bet.objects.create(user = user, amount=bet)
+                return redirect('play_game')
+            gameBet = Game_Bet.objects.create(user = user, amount=bet)     
+            return redirect('chat_game', pk=game.id)
+        else:
+            messages.error(request, "У вас недостаточно баланса")
     return render(request, 'chat/bet_game.html', context=context)
+
 
 @login_required
 def play_game(request):
     context=get_common_context(request)
-    user = request.user
-    user_profile = UserProfile.objects.get(user=user)
-    wallet = Wallet.objects.get(user_profile = user_profile)
-    if wallet.balance < 3:
-        messages.error(request, "У вас недостаточно баланса")
-        return redirect('proceed_donate')
-    user_profile.is_searching_game = True
-    user_profile.save()
-
-    game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
-    if not game:
-        other_profiles = UserProfile.objects.filter(is_searching_game=True).exclude(user=user)
-        if other_profiles.exists():
-            # Нашли других игроков - создаем игру
-            other_profile = other_profiles.first()
-            game = Game.objects.create(player1=user_profile.user, player2=other_profile.user, is_searching=False)
-            user_profile.is_searching_game = False
-            user_profile.save()
-            other_profile.is_searching_game = False
-            other_profile.save()
-    if game:
-        # Если игра найдена, перенаправляем пользователя на страницу игры
-        return redirect('chat_game', pk=game.id)
-    else:
-        # Если игра не найдена, отображаем страницу поиска
-        return render(request ,'chat/play_game.html', context=context)
+    return render(request ,'chat/play_game.html', context=context)
 
 @login_required
+@database_sync_to_async
 def check_game(request):
     user = request.user
     game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
     if game:
-        return JsonResponse({'game_id': game.id})
+        # Check if 10 minutes have passed since the game was created
+        if timezone.now() - game.start_time >= timedelta(minutes=1):
+            # If 10 minutes have passed, return the bet to the user and delete the game
+            user_profile = UserProfile.objects.get(user=user)
+            wallet = Wallet.objects.get(user_profile = user_profile)
+            wallet.balance += game.bet
+            wallet.save()
+            game.delete()
+            return JsonResponse({'game_id': None, 'message': 'Game not found. Your bet has been returned.'})
+        elif game.player2:
+            return JsonResponse({'game_id': game.id})
+        else:
+            return JsonResponse({'game_id': None})
     else:
         return JsonResponse({'game_id': None})
 

@@ -6,32 +6,40 @@
 <div class="container main_container">
     <div class="row bet_row text-center">
         <h1 class="headtitle" >Выберите ставку</h1>
-        <div class="col-sm-2">
-            <button class="my_btn" style="--clr:#EA00FF"><span>0,1$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FFF01F"><span>0,3$</span><i></i></button>
-            <button class="my_btn" style="--clr:#7FFF00"><span>0,5$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FF5E00"><span>0,7$</span><i></i></button>
-            <button class="my_btn" style="--clr:#39FF14"><span>0,9$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FF44CC"><span>1,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#0FF0FC"><span>1,2$</span><i></i></button>
-            <button class="my_btn" style="--clr:#8A2BE2"><span>1,5$</span><i></i></button>
-            <button class="my_btn" style="--clr:#EA00FF"><span>1,7$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FFF01F"><span>1,9$</span><i></i></button>
-            <button class="my_btn" style="--clr:#7FFF00"><span>2,0$</span><i></i></button>
-        </div>
-        <div class="col-sm-2">
-            <button class="my_btn" style="--clr:#EA00FF"><span>3,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FFF01F"><span>3,5$</span><i></i></button>
-            <button class="my_btn" style="--clr:#7FFF00"><span>4,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FF5E00"><span>4,5$</span><i></i></button>
-            <button class="my_btn" style="--clr:#39FF14"><span>5,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FF44CC"><span>6,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#0FF0FC"><span>7,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#8A2BE2"><span>8,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#EA00FF"><span>9,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#FFF01F"><span>10,0$</span><i></i></button>
-            <button class="my_btn" style="--clr:#7FFF00"><span>12,0$</span><i></i></button>
-        </div>
+        <form action="" method="POST" action="{% url 'bet_game' %}">
+            {% csrf_token %}
+            <div class="bet_row row text-center">
+
+
+                <div class="col-sm-2">
+                    <button class="my_btn" style="--clr:#EA00FF" value="0.1" name="bet"><span>0,1$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FFF01F" value="0.3" name="bet"><span>0,3$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#7FFF00" value="0.5" name="bet"><span>0,5$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FF5E00" value="0.7" name="bet"><span>0,7$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#39FF14" value="0.9" name="bet"><span>0,9$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FF44CC" value="1.0" name="bet"><span>1,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#0FF0FC" value="1.2" name="bet"><span>1,2$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#8A2BE2" value="1.5" name="bet"><span>1,5$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#EA00FF" value="1.7" name="bet"><span>1,7$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FFF01F" value="1.9" name="bet"><span>1,9$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#7FFF00" value="2.0" name="bet"><span>2,0$</span><i></i></button>
+
+                </div>
+                <div class="col-sm-2">
+                    <button class="my_btn" style="--clr:#EA00FF" value="3.0" name="bet"><span>3,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FFF01F" value="3.5" name="bet"><span>3,5$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#7FFF00" value="4.0" name="bet"><span>4,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FF5E00" value="4.5" name="bet"><span>4,5$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#39FF14" value="5.0" name="bet"><span>5,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FF44CC" value="6.0" name="bet"><span>6,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#0FF0FC" value="7.0" name="bet"><span>7,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#8A2BE2" value="8.0" name="bet"><span>8,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#EA00FF" value="9.0" name="bet"><span>9,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#FFF01F" value="10.0" name="bet"><span>10,0$</span><i></i></button>
+                    <button class="my_btn" style="--clr:#7FFF00" value="12.0" name="bet"><span>12,0$</span><i></i></button>            
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 

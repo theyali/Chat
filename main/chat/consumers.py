@@ -1,9 +1,13 @@
+from datetime import timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
-from .models import UserProfile, Game
+from .models import Game_Bet, UserProfile, Game, Wallet
 import json
 import random
+from django.db.models import Q
+from django.utils import timezone
+from django.shortcuts import render, redirect,  get_object_or_404 
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -32,13 +36,24 @@ class GameConsumer(AsyncWebsocketConsumer):
     def terminate_game(self, game_id, user):
         game = Game.objects.filter(pk=game_id).first()
         if game:
-            if game.player1 == user or game.player2 == user:
-                game.delete()
-                # Set the other player to searching mode
-                other_player = game.player2 if game.player1 == user else game.player1
-                other_profile = UserProfile.objects.get(user=other_player)
-                other_profile.is_searching_game = True
-                other_profile.save()
+            if game.player1 == user:
+                if game.player2:
+                    # If the game has a second player, make them the first player
+                    game.player1 = game.player2
+                    game.player2 = None
+            elif game.player2 == user:
+                # If the second player is the one leaving, just set player2 to None
+                game.player2 = None
+
+            game.is_searching = True
+            game.save()
+
+            # Set the remaining player to searching mode
+            remaining_player = game.player1
+            remaining_profile = UserProfile.objects.get(user=remaining_player)
+            remaining_profile.is_searching_game = True
+            remaining_profile.save()
+
                 
     async def disconnect(self, close_code):
         # Leave room group
@@ -107,3 +122,51 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
         profile = UserProfile.objects.get(user=user)
         profile.is_searching_game = False
         profile.save()
+
+        # Delete the game if this user is a player in the game
+        game = Game.objects.filter(Q(player1=user) | Q(player2=user), is_searching=True).first()
+        if game:
+            game.delete()
+            
+        last_bet = Game_Bet.objects.filter(user=user).last()
+        if not last_bet.is_returned:
+            wallet = Wallet.objects.get(user_profile=profile)
+            # Add the bet amount back to the user's wallet
+            wallet.balance += last_bet.amount
+            wallet.save()
+        last_bet.delete()
+
+    # Handle 'check_game_status' message
+    @database_sync_to_async
+    def check_game_status(self):
+        user = self.user
+        game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
+        last_bet = Game_Bet.objects.filter(user=user).last()
+        if game:
+            if timezone.now() - game.start_time >= timedelta(minutes=4):
+                user_profile = UserProfile.objects.get(user=user)
+                wallet = Wallet.objects.get(user_profile=user_profile)
+                wallet.balance += game.bet
+                wallet.save()
+                last_bet.is_returned = True
+                last_bet.save()
+                game.delete()
+                return {
+                    'type': 'redirect',
+                    'url': '/bet_game/'
+                }
+            elif game.player2:
+                return {
+                    'game_id': game.id
+                }
+        return None
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        if text_data_json['type'] == 'check_game_status':
+            response = await self.check_game_status()
+            if response is not None:
+                await self.send(text_data=json.dumps(response))
+
+
+

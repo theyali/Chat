@@ -2596,3 +2596,22 @@ ol {
 	color: white;
 	margin-bottom: 2%;
 }
+
+.game_info{
+	font-weight: bold;
+	font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	padding: 15px;
+	font-size: 20px;
+}
+
+.game_info_wrapper{
+	margin-top: 30%;
+}
+
+.game_search_label{
+	font-weight: bold;
+	font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	font-size: 20px;
+	margin-left: 20%;
+	color: white;
+}

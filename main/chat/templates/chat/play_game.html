@@ -7,15 +7,27 @@
     <div id="game-container">
       <div class="row">
         <div class="col-sm">
-          <img class="play_game_user_image"  src="{% static 'chat/img/user.png' %}" alt="">
+          <img class="play_game_user_image fa-beat-fade"  src="{% static 'chat/img/user.png' %}" alt="">
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 ">
+          <p class="game_search_label">Ищем игроков...</p>
           <div id="game-message">
 
           </div>
+          <div class="wrappper game_info_wrapper">
+            <div class="title">Правила игры</div>
+            <p class="game_info">
+              Добро пожаловать в игру!
+              Здесь вы можете испытать свою удачу и соревноваться с другими игроками. 
+              Правила просты: если выпадают четные числа, то игрок слева выигрывает. 
+              Если вам не удастся найти соперника, не волнуйтесь!
+               Ваша ставка будет возвращена, и вы будете перенаправлены на страницу ставок.
+            </p>
+          </div>
+          
         </div>
         <div class="col-sm">
-          <img class="play_game_user_image" src="{% static 'chat/img/user.png' %}" alt="">
+          <img class="play_game_user_image fa-beat-fade" src="{% static 'chat/img/user.png' %}" alt="">
         </div>
       </div>
           
@@ -65,36 +77,44 @@
 </div>
 
 <script>
-  // функция для обновления состояния игры
-  function updateGameStatus() {
-      fetch("{% url 'check_game' %}")
-          .then(response => response.json())
-          .then(data => {
-              if (data.game_id) {
-                  // Если игра найдена, перенаправляем на страницу игры
-                  // Замените 'your_base_url' на базовый URL вашего веб-сайта
-                  window.location.href = '/chat_game/' + data.game_id ;
-                } else {
-                var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
-                var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
-                $("#game-message").html(buttonHtml);
-                  // Иначе, обновляем состояние через 5 секунд
-                  setTimeout(updateGameStatus, 1000);
-              }
-          });
-  }
-  
-  // запускаем обновление состояния игры
-  updateGameStatus();
-
   let searchGameSocket = new WebSocket(
-    'ws://' + window.location.host + '/ws/search_game/'
-);
-
-window.onbeforeunload = function() {
-    searchGameSocket.close();
+      'ws://' + window.location.host + '/ws/search_game/'
+  );
+  
+  searchGameSocket.onmessage = function(e) {
+    let data = JSON.parse(e.data);
+    console.log(data)
+    if (data.type && data.type === 'redirect') {
+        window.location.href = data.url;
+    }
+    
+    // Rest of your code
 };
+
+var svgHtml = '<svg width="40" height="30" viewBox="5 0 80 60" class="waveImg"><path class="wave" fill="none" stroke="#4963E3" stroke-width="3" stroke-linecap="round" d="M 0 37.5 c 7.684299348848887 0 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15 s 7.172012725592294 15 15 15 s 7.172012725592294 -15 15 -15" /></svg>';
+        var buttonHtml = '<button class="waveBtn">' + svgHtml + '</button>';
+        $("#game-message").html(buttonHtml);
+
+  
+  window.onbeforeunload = function() {
+      searchGameSocket.close();
+  };
+  
+  searchGameSocket.onopen = function(e) {
+    console.log("Connection established!");
+    setInterval(function() {
+        // Отправляем сообщение на сервер каждую секунду
+        searchGameSocket.send(JSON.stringify({ 'type': 'check_game_status' }));
+    }, 1000);
+  };
+  
+  searchGameSocket.onerror = function(e) {
+    console.error("WebSocket error observed:", e);
+  };
   </script>
+  
+
+
   
 
 

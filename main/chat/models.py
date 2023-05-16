@@ -59,7 +59,21 @@ class Game(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     is_searching = models.BooleanField(default=True)
     bet = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    is_controlled_by_site = models.BooleanField(default=False) # Добавлено
+    winner = models.ForeignKey(User, related_name='games_won', on_delete=models.SET_NULL, null=True, blank=True) # Добавлено
 
     def __str__(self):
         return f"Game ({self.player1} vs {self.player2})"
+
+    
+
+class Game_Bet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_winning = models.BooleanField(default=False)
+    is_returned = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username}'s bet of {self.amount} on {self.game}"
 
