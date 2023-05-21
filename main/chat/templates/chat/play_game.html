@@ -84,9 +84,13 @@
   searchGameSocket.onmessage = function(e) {
     let data = JSON.parse(e.data);
     console.log(data)
-    if (data.type && data.type === 'redirect') {
-        window.location.href = data.url;
-    }
+    if(data.game_id){
+      // Используем game_id для создания URL для перенаправления
+      window.location.href = data.url + data.game_id;
+  } else {
+      window.location.href = data.url;
+  }
+
     
     // Rest of your code
 };

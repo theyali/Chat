@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import get_random_string
 from .utils import generate_ref_code
-import uuid
 # Create your models here.
 
 class User(AbstractUser):
@@ -61,6 +60,7 @@ class Game(models.Model):
     bet = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     is_controlled_by_site = models.BooleanField(default=False) # Добавлено
     winner = models.ForeignKey(User, related_name='games_won', on_delete=models.SET_NULL, null=True, blank=True) # Добавлено
+    random_number = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"Game ({self.player1} vs {self.player2})"

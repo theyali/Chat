@@ -12,11 +12,10 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import JsonResponse
-from django.db.models import Q
 from decimal import Decimal
-from channels.db import database_sync_to_async
-from datetime import  timedelta
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.views.decorators.http import require_http_methods
 
 # paypalrestsdk.configure({
 #   "mode": "sandbox", # Режим Sandbox для тестирования
@@ -296,28 +295,6 @@ def play_game(request):
     context=get_common_context(request)
     return render(request ,'chat/play_game.html', context=context)
 
-@login_required
-@database_sync_to_async
-def check_game(request):
-    user = request.user
-    game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
-    if game:
-        # Check if 10 minutes have passed since the game was created
-        if timezone.now() - game.start_time >= timedelta(minutes=1):
-            # If 10 minutes have passed, return the bet to the user and delete the game
-            user_profile = UserProfile.objects.get(user=user)
-            wallet = Wallet.objects.get(user_profile = user_profile)
-            wallet.balance += game.bet
-            wallet.save()
-            game.delete()
-            return JsonResponse({'game_id': None, 'message': 'Game not found. Your bet has been returned.'})
-        elif game.player2:
-            return JsonResponse({'game_id': game.id})
-        else:
-            return JsonResponse({'game_id': None})
-    else:
-        return JsonResponse({'game_id': None})
-
 
 @login_required
 def chat_game(request, pk):
@@ -326,20 +303,3 @@ def chat_game(request, pk):
     # Генерируем токены для каждого игрока
     context['game']= game
     return render(request ,'chat/chat_game.html', context=context)
-
-@login_required
-def update_player_status(request):
-    if request.method == 'POST':
-        player_id = request.POST.get('player_id')
-        status = request.POST.get('status')
-        game_id = request.POST.get('game_id')
-        game = Game.objects.get(id=game_id)
-        game.delete()
-        userProfile = UserProfile(user_id=player_id)
-        userProfile.is_searching_game = False
-        user_profile.save()
-        redirect('play_game')
-        # Обновление статуса игрока на сервере
-        return JsonResponse({'status': 'success'})
-    else:
-        return JsonResponse({'status': 'error'})
