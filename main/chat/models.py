@@ -69,11 +69,12 @@ class Game(models.Model):
 
 class Game_Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    current_game = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_winning = models.BooleanField(default=False)
     is_returned = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user.username}'s bet of {self.amount} on {self.game}"
+        return f"{self.user.username}'s bet of {self.amount} on {self.current_game}"
 

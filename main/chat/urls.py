@@ -23,8 +23,5 @@ path('', views.home, name='home'),
     re_path('users_count/', views.users_count, name='users_count'),
     path('chat_game/<int:pk>', views.chat_game, name='chat_game'),
     path('chat_game/delete/<int:game_id>', views.delete_game, name='delete_game'),
-
-
-
-
+    path('bet_history/', views.bet_history, name='bet_history'),
 ]

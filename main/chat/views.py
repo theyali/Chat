@@ -284,14 +284,22 @@ def bet_game(request):
                 game.save()
                 user_profile.is_searching_game = True
                 user_profile.save()
-                gameBet = Game_Bet.objects.create(user = user, amount=bet)
+                gameBet = Game_Bet.objects.create(user = user, amount=bet, current_game=game)
                 return redirect('play_game')
-            gameBet = Game_Bet.objects.create(user = user, amount=bet)     
+            gameBet = Game_Bet.objects.create(user = user, amount=bet, current_game=game)     
             return redirect('chat_game', pk=game.id)
         else:
             messages.error(request, "У вас недостаточно баланса")
     return render(request, 'chat/bet_game.html', context=context)
 
+
+@login_required
+def bet_history(request):
+    context = get_common_context(request)
+    bets = Game_Bet.objects.filter(user=request.user)
+    print(bets)
+    context['bets']=bets
+    return render(request, 'chat/bet_history.html', context=context)
 
 @login_required
 def play_game(request):

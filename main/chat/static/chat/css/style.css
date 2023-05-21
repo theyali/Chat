@@ -2624,3 +2624,9 @@ ol {
 .chat_user img{
 	width: 50%;
 }
+.bet_table{
+	color: white!important;
+}
+.bet_table thead{
+	font-size: 20px;
+}

@@ -1,0 +1,65 @@
+{% extends 'main.html' %}
+
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}История ставок{% endblock page_title %}
+
+{% block main %}
+
+<div id="alert-box" role="alert">
+    <!-- Alert message will be inserted here dynamically -->
+</div>
+<style>
+    .alert-box {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        border-radius: .25rem;
+        z-index: 9999;
+    }
+</style>
+<table class="table table-bordered bet_table">
+    <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Дата ставки</th>
+            <th scope="col">Отмена игры</th>
+            <th scope="col">Сумма ставки</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if bets %}
+            {% for bet in bets %}
+                {% if bet.is_winning %}
+                    <tr class="alert alert-success">
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ bet.timestamp }}</td>
+                        <td>{{ bet.is_returned }}</td>
+                        <td>{{ bet.amount }}</td>
+                    </tr>
+                {% else %}
+                    <tr class="alert alert-danger">
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ bet.timestamp }}</td>
+                        <td>{{ bet.is_returned }}</td>
+                        <td>{{ bet.amount }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+        <tr>
+            <th colspan="3" class="text-center">У вас нет ставок</th>
+        </tr>
+        {% endif %}
+    </tbody>
+  </table>
+
+{% endblock main %}

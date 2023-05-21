@@ -2,7 +2,7 @@ from datetime import timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
-from .models import Game_Bet, UserProfile, Game, Wallet
+from .models import Game_Bet, UserProfile, Game, Wallet, Game_Bet
 import json
 from django.db.models import Q
 from django.utils import timezone
@@ -43,6 +43,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         winner_wallet = Wallet.objects.select_for_update().get(user_profile=winner_profile)
         winner_wallet.balance += game.bet * 2
         winner_wallet.save()
+
+        # Update game_bet.is_winning for the winner
+        game_bet = Game_Bet.objects.get(current_game=game, user=winner)
+        game_bet.is_winning = True
+        game_bet.save()
 
         # Set the players to searching mode
         winner_profile.is_searching_game = True
@@ -179,7 +184,6 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                     # Add the bet amount back to the user's wallet
                     wallet.balance += last_bet.amount
                     wallet.save()
-                    print("Берем последнюю ставку")
                 last_bet.delete()
 
 
@@ -201,7 +205,6 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                 wallet = Wallet.objects.get(user_profile=user_profile)
                 wallet.balance += game.bet
                 wallet.save()
-                print("Прошло 4 минуты")
                 last_bet = Game_Bet.objects.filter(user=user).last()
                 last_bet.is_returned = True
                 last_bet.save()
