@@ -1,5 +1,4 @@
 from datetime import timedelta
-import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
@@ -7,7 +6,7 @@ from .models import Game_Bet, UserProfile, Game, Wallet
 import json
 from django.db.models import Q
 from django.utils import timezone
-from asgiref.sync import sync_to_async
+from django.db import transaction
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -24,8 +23,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     @database_sync_to_async
+    @transaction.atomic
     def update_game_result(self, game_id, winner):
-        game = Game.objects.get(pk=game_id)
+        game = Game.objects.select_for_update().get(pk=game_id)
+        
+        if game.winner is not None:
+            # If the game result has already been processed, skip the processing
+            return
+
         loser = game.player1 if game.player1 != winner else game.player2
 
         # Update the game status
@@ -35,7 +40,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Update the winner's balance
         winner_profile = UserProfile.objects.get(user=winner)
-        winner_wallet = Wallet.objects.get(user_profile=winner_profile)
+        winner_wallet = Wallet.objects.select_for_update().get(user_profile=winner_profile)
         winner_wallet.balance += game.bet * 2
         winner_wallet.save()
 
@@ -72,21 +77,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Return the message instead of sending it
         message = {
             'number': number,
-            'winner': winner.username if winner else None,
+            'winner': winner.email if winner else None,
         }
-
-        if winner:
-            # Update player balance
-            await self.update_player_balance(winner)
-
-            # Announce the game result
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'game_result',
-                    'winner': winner.username,
-                }
-            )
 
         return message
 
@@ -99,16 +91,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # handle game termination
         await self.terminate_game(self.room_name, self.scope["user"])
-
-    @sync_to_async
-    def update_player_balance(self, winner):
-        game = Game.objects.filter(pk=self.room_name).first() # Assumption: room_name is game id
-        if game:
-            profile = UserProfile.objects.get(user=winner)
-            wallet = Wallet.objects.get(user_profile=profile)
-            if wallet:
-                wallet.balance += game.bet*2
-                wallet.save()
                 
     @database_sync_to_async
     def terminate_game(self, game_id, user):
@@ -185,38 +167,42 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
         profile.is_searching_game = False
         profile.save()
 
-        # Delete the game if this user is a player in the game
-        game = Game.objects.filter(Q(player1=user) | Q(player2=user), is_searching=True).first()
+        # Delete the game if this user is a player in the game and the game is still searching for another player
+        game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
         if game:
-            game.delete()
-            
-        last_bet = Game_Bet.objects.filter(user=user).last()
-        if not last_bet.is_returned:
-            wallet = Wallet.objects.get(user_profile=profile)
-            # Add the bet amount back to the user's wallet
-            wallet.balance += last_bet.amount
-            wallet.save()
-        last_bet.delete()
+            if game.is_searching:  
+                game.delete()
+                
+                last_bet = Game_Bet.objects.filter(user=user).last()
+                if not last_bet.is_returned:
+                    wallet = Wallet.objects.get(user_profile=profile)
+                    # Add the bet amount back to the user's wallet
+                    wallet.balance += last_bet.amount
+                    wallet.save()
+                    print("Берем последнюю ставку")
+                last_bet.delete()
 
-    # Handle 'check_game_status' message
+
     @database_sync_to_async
     def check_game_status(self):
         user = self.user
-        game = Game.objects.filter(Q(player1=user) | Q(player2=user), is_searching=False).first()
+        game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
         if game:
-            return {
+            if not game.is_searching:
+                # If the game is found, redirect the user, and do not return the bet
+                return {
                     'type': 'redirect',
                     'url': '/chat_game/',
-                    'game_id':game.id
+                    'game_id': game.id
                 }
-        game = Game.objects.filter(Q(player1=user) | Q(player2=user)).first()
-        last_bet = Game_Bet.objects.filter(user=user).last()
-        if game:
-            if timezone.now() - game.start_time >= timedelta(minutes=4):
+            elif timezone.now() - game.start_time >= timedelta(minutes=4):
+                # If the game wait time exceeds 4 minutes, return the bet
                 user_profile = UserProfile.objects.get(user=user)
                 wallet = Wallet.objects.get(user_profile=user_profile)
                 wallet.balance += game.bet
                 wallet.save()
+                print("Прошло 4 минуты")
+                last_bet = Game_Bet.objects.filter(user=user).last()
                 last_bet.is_returned = True
                 last_bet.save()
                 game.delete()
@@ -224,18 +210,14 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                     'type': 'redirect',
                     'url': '/bet_game/'
                 }
-            elif game.player2:
-                return {
-                    'game_id': game.id
-                }
         else:
-            # Проверка количества побед пользователя
+            # Check the user's number of wins
             win_count = Game.objects.filter(winner=user).count()
             if 7 <= win_count <= 15:
-                # Создание игры с искусственным противником
-                site_user = User.objects.get(username="admin")  # Аккаунт сайта
+                # Creating a game with an artificial opponent
+                site_user = User.objects.get(username="admin")  # Site account
                 new_game = Game.objects.create(player1=user, player2=site_user)
-                # Управление результатом игры
+                # Control the result of the game
                 new_game.winner = site_user
                 new_game.save()
                 return {
@@ -243,13 +225,13 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                 }
         return None
 
-
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         if text_data_json['type'] == 'check_game_status':
             response = await self.check_game_status()
             if response is not None:
                 await self.send(text_data=json.dumps(response))
+
 
 
 

@@ -2615,3 +2615,12 @@ ol {
 	margin-left: 20%;
 	color: white;
 }
+
+.chat_user{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.chat_user img{
+	width: 50%;
+}

@@ -5,19 +5,20 @@
 
 <div class="container main_container">
   <div id="game-container">
-      <h1>Игра</h1>
+      <div id="message" class="alert alert-info text-center"></div>
         <p id="countdown">5</p>
         <section id="video-streams">
-          <div class="wrappper player1_div">
-            <div class="player1">{{ game.player1 }}</div>
+          <div class="chat_user">
+            <img src="{% static 'chat/img/chat_user.png' %}" alt="">
           </div>
-          <img class='vs_img' src="{% static 'chat/img/vs.png' %}" alt="">
-          <div class="wrappper player2_div">
-            <div class="player2">{{game.player2}}</div>
+          
+          <div class="chat_user">
+            <img src="{% static 'chat/img/chat_user.png' %}" alt="">
           </div>
         </section>
         <div id="wheel">
           <div id="numbers">
+              <img src="{% static 'chat/img/0.png' %}" alt="0">
               <img src="{% static 'chat/img/1.png' %}" alt="1">
               <img src="{% static 'chat/img/2.png' %}" alt="2">
               <img src="{% static 'chat/img/3.png' %}" alt="3">
@@ -27,7 +28,6 @@
               <img src="{% static 'chat/img/7.png' %}" alt="7">
               <img src="{% static 'chat/img/8.png' %}" alt="8">
               <img src="{% static 'chat/img/9.png' %}" alt="9">
-              <img src="{% static 'chat/img/0.png' %}" alt="0">
               <!-- и так далее до 10 -->
           </div>
         </div>
@@ -42,92 +42,117 @@
 
 
 <script>
-    var gameId = "{{ game.id }}";  // Здесь мы передаем game.id из Django в JavaScript
-    
-    var gameSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/chat/' + gameId + '/');
-  
-    gameSocket.onopen = function(e) {
-      // Start the countdown when the connection is established
-      var countdownElement = document.getElementById("countdown");
-      var countdown = 5;
-      var countdownInterval = setInterval(function() {
-        countdown--;
-        countdownElement.textContent = countdown;
-        if(countdown === 0) {
-          clearInterval(countdownInterval);
-          // Send start_game message once the countdown is finished
-          gameSocket.send(JSON.stringify({
-              'message': 'start_game'
-          }));
-        }
-      }, 1000);
-    };
-  
-    gameSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-  
-    gameSocket.onmessage = function(e) {
-      var data = JSON.parse(e.data);
-      var message = data['message'];
-      var number = data['number'];
-      var winner = data['winner'];
-      var myEmail = '{{ email }}';
-      var csrftoken = getCookie('csrftoken');
+  var gameId = "{{ game.id }}";  // Здесь мы передаем game.id из Django в JavaScript
 
-      function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+  var gameSocket = new WebSocket(
+      'ws://' + window.location.host +
+      '/ws/chat/' + gameId + '/');
+  
+  gameSocket.onopen = function(e) {
+    // Start the countdown when the connection is established
+    var countdownElement = document.getElementById("countdown");
+    var countdown = 5;
+    var countdownInterval = setInterval(function() {
+      countdown--;
+      countdownElement.textContent = countdown;
+      if(countdown === 0) {
+        clearInterval(countdownInterval);
+        // Send start_game message once the countdown is finished
+        gameSocket.send(JSON.stringify({
+            'message': 'start_game'
+        }));
       }
-      if (message == 'Other player left the game.') {
-          // Redirect to the searching page
-          window.location.href = "{% url 'play_game' %}";
-      }
-      if (number !== undefined) {
-        console.log(number)
-        // Start the spin animation with the received number
-        let position = number * 200; // Each image has a height of 200px
-        gsap.to("#numbers", {
-            y: -position,
-            ease: "power1.inOut",
-            duration: 2
-        }).then(function() {
-          console.log(myEmail);
-          console.log('{{ game.player1 }}');
-          if (myEmail === '{{ game.player1 }}') {
-            fetch('/chat_game/delete/' + gameId, {  
-              method: 'DELETE',
-              credentials: 'same-origin', 
-              headers: {
-                'X-CSRFToken': csrftoken 
-              },
-          }).then((response) => {
-                if (response.ok) {
-                    // If the game was successfully deleted, redirect to the betting page
-                    window.location.href = "{% url 'bet_game' %}";
-                } else {
-                    console.error('Failed to delete the game');
-                }
-            }).catch((error) => {
-                console.error('Error:', error);
-            });
+    }, 1000);
+  };
+  
+  gameSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+  
+  gameSocket.onmessage = function(e) {
+    var data = JSON.parse(e.data);
+    var message = data['message'];
+    var number = data['number'];
+    var winner = data['winner'];
+    var myEmail = '{{ email }}';
+    var csrftoken = getCookie('csrftoken');
+  
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
           }
-        });
       }
-    };
+      return cookieValue;
+    }
+  
+    if (message == 'Other player left the game.') {
+        // Redirect to the searching page
+        window.location.href = "{% url 'play_game' %}";
+    }
+  
+    if (number !== undefined) {
+      // Start the spin animation with the received number
+      let position = number * 200; // Each image has a height of 200px
+      gsap.to("#numbers", {
+          y: -position,
+          ease: "power1.inOut",
+          duration: 2
+      }).then(function() {
+    
+        // Winner logic here
+        if (winner !== undefined) {
+          // Change the winner's image and show the message
+          var messageDiv = document.getElementById("message");
+          var winnerImgSrc = "{% static 'chat/img/chat_user_winner.png' %}";
+          if (winner === '{{ game.player1 }}') {
+            // Player 1 won
+            document.querySelector('.chat_user:nth-child(1) img').src = winnerImgSrc;
+            messageDiv.textContent = "Player 1 won the game!";
+          } else if (winner === '{{ game.player2 }}') {
+            // Player 2 won
+            document.querySelector('.chat_user:nth-child(2) img').src = winnerImgSrc;
+            messageDiv.textContent = "Player 2 won the game!";
+          }
+        }
+    
+        // Delete the game and redirect after a delay
+        if (myEmail === '{{ game.player1 }}') {
+          fetch('/chat_game/delete/' + gameId, {  
+            method: 'DELETE',
+            credentials: 'same-origin', 
+            headers: {
+              'X-CSRFToken': csrftoken 
+            },
+          }).then((response) => {
+              if (response.ok) {
+                // Wait 3 seconds before redirecting
+                setTimeout(() => {
+                  // If the game was successfully deleted, redirect to the betting page
+                  window.location.href = "{% url 'bet_game' %}";
+                }, 3000);
+              } else {
+                  console.error('Failed to delete the game');
+              }
+          }).catch((error) => {
+              console.error('Error:', error);
+          });
+        }else{
+          setTimeout(() => {
+            // If the game was successfully deleted, redirect to the betting page
+            window.location.href = "{% url 'bet_game' %}";
+          }, 3000);
+        }
+      });
+    }
+  }    
+  
   </script>
 
 

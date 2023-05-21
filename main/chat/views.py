@@ -1,4 +1,5 @@
 import json
+import random
 import uuid
 from django.shortcuts import render, redirect,  get_object_or_404 
 from django.contrib import messages
@@ -279,6 +280,8 @@ def bet_game(request):
             else:
                 # If no such game exists, create a new game with the current user as the first player
                 game = Game.objects.create(player1=user, bet=bet, is_searching=True)
+                game.random_number = random.randint(0,9)
+                game.save()
                 user_profile.is_searching_game = True
                 user_profile.save()
                 gameBet = Game_Bet.objects.create(user = user, amount=bet)
@@ -302,4 +305,15 @@ def chat_game(request, pk):
     game = Game.objects.filter(pk=pk).first()
     # Генерируем токены для каждого игрока
     context['game']= game
+    context['email'] = request.user.email
     return render(request ,'chat/chat_game.html', context=context)
+
+@login_required
+@require_http_methods(["DELETE"])
+def delete_game(request, game_id):
+    game = Game.objects.filter(id=game_id).first()
+    if game:
+        game.delete()
+        return JsonResponse({'message': 'Game deleted.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Game not found.'}, status=404)
