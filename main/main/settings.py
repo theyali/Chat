@@ -27,11 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    'c337-82-194-20-109.ngrok-free.app'
+    'a1b7-82-194-20-183.ngrok-free.app'
 ]
 # CORS_ALLOWED_ORIGINS = ['https://e85b-82-194-24-65.ngrok-free.app', 'e85b-82-194-24-65.ngrok-free.app']
 CSRF_TRUSTED_ORIGINS =[
-    'https://c337-82-194-20-109.ngrok-free.app',
+    'https://a1b7-82-194-20-183.ngrok-free.app',
 ]
 SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
 
