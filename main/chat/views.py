@@ -251,7 +251,6 @@ def payment_success(request):
     return render(request, 'chat/payment_success.html', context=context)
 
 
-@login_required
 def users_count(request):
     online_users = User.objects.filter(userprofile__is_online=True)
     user_count = online_users.count()
