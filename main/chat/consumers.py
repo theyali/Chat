@@ -213,19 +213,6 @@ class SearchGameConsumer(AsyncWebsocketConsumer):
                     'type': 'redirect',
                     'url': '/bet_game/'
                 }
-        else:
-            # Check the user's number of wins
-            win_count = Game.objects.filter(winner=user).count()
-            if 7 <= win_count <= 15:
-                # Creating a game with an artificial opponent
-                site_user = User.objects.get(username="admin")  # Site account
-                new_game = Game.objects.create(player1=user, player2=site_user)
-                # Control the result of the game
-                new_game.winner = site_user
-                new_game.save()
-                return {
-                    'game_id': new_game.id
-                }
         return None
 
     async def receive(self, text_data):

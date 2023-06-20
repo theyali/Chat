@@ -24,4 +24,9 @@ path('', views.home, name='home'),
     path('chat_game/<int:pk>', views.chat_game, name='chat_game'),
     path('chat_game/delete/<int:game_id>', views.delete_game, name='delete_game'),
     path('bet_history/', views.bet_history, name='bet_history'),
+    #For admin only
+    path('withdrawal_requests/', views.withdrawal_requests, name='withdrawal_requests'),
+    path('all_users/', views.all_users, name='all_users'),
+    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
+
 ]

@@ -10,13 +10,14 @@ from .forms import MyUserCreationForm, DepositForm
 from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from django.http import JsonResponse
 from decimal import Decimal
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.views.decorators.http import require_http_methods
+from django.db.models import Sum
 
 # paypalrestsdk.configure({
 #   "mode": "sandbox", # Режим Sandbox для тестирования
@@ -264,15 +265,30 @@ def bet_game(request):
         bet = Decimal(request.POST['bet'])
         user = request.user
         user_profile = UserProfile.objects.get(user=user)
-        wallet = Wallet.objects.get(user_profile = user_profile)
+        wallet = Wallet.objects.get(user_profile=user_profile)
         if wallet.balance >= bet:
             wallet.balance -= bet
             wallet.save()
 
+            # Get the last 8 bets of the user
+            last_bets = Game_Bet.objects.filter(user=user).order_by('-timestamp')[:8]
+
             # Check if there is an existing game that is searching for a player with the same bet
             game = Game.objects.filter(bet=bet, is_searching=True).exclude(player1=user).first()
-
-            if game:
+            print("Before if " , len(last_bets))
+            # Check if more than 7 of them are winning
+            if len([bet for bet in last_bets if bet.is_winning]) > 7:
+                print('Redirect for user', user)
+                # Creating a game with an artificial opponent
+                site_user = User.objects.get(username="admin")  # Site account
+                game = Game.objects.create(player1=user, player2=site_user, bet=bet, is_searching=False)
+                # Control the result of the game
+                game.winner = site_user
+                game.random_number = 1
+                game.save()
+                gameBet = Game_Bet.objects.create(user=user, amount=bet, current_game=game)
+                return redirect('play_game')
+            elif game:
                 # If such a game exists, add the current user as the second player
                 game.player2 = user
                 game.is_searching = False
@@ -284,13 +300,15 @@ def bet_game(request):
                 game.save()
                 user_profile.is_searching_game = True
                 user_profile.save()
-                gameBet = Game_Bet.objects.create(user = user, amount=bet, current_game=game)
-                return redirect('play_game')
-            gameBet = Game_Bet.objects.create(user = user, amount=bet, current_game=game)     
-            return redirect('chat_game', pk=game.id)
+
+            gameBet = Game_Bet.objects.create(user=user, amount=bet, current_game=game)
+            return redirect('play_game')
+
         else:
             messages.error(request, "У вас недостаточно баланса")
     return render(request, 'chat/bet_game.html', context=context)
+
+
 
 
 @login_required
@@ -325,3 +343,46 @@ def delete_game(request, game_id):
         return JsonResponse({'message': 'Game deleted.'}, status=200)
     else:
         return JsonResponse({'error': 'Game not found.'}, status=404)
+    
+@login_required
+def withdrawal_requests(request):
+    context = get_common_context(request)
+    return render(request, 'chat/withdrawal_requests.html', context=context)
+
+
+
+
+@login_required
+def all_users(request):
+    users = User.objects.all().select_related('userprofile')
+
+    user_data = []
+    for user in users:
+        profile = user.userprofile
+        bet_sum = Game_Bet.objects.filter(user=user, is_winning=True, is_returned=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        transaction_sum = Transaction.objects.filter(user=user).aggregate(Sum('amount'))['amount__sum'] or 0
+
+        user_data.append({
+            'user': user,
+            'email': user.email,
+            'username': user.username,
+            'profile': profile,
+            'bet_sum': bet_sum,
+            'transaction_sum': transaction_sum
+        })
+
+    context = {'user_data': user_data}
+
+    return render(request, 'chat/all_users.html', context=context)
+
+
+def is_superuser(user):
+    return user.is_superuser
+
+@user_passes_test(is_superuser)
+def delete_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('all_users')
+    return render(request, 'chat/confirm_delete.html', {'user': user})

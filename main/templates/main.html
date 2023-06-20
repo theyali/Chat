@@ -92,6 +92,16 @@
                     <li><a href="">Тех поддержка</a></li>
                 </div>
                 <hr>
+                {% if request.user.is_superuser %}
+                <div class="side_col text-center">
+                    <li><a href="{% url 'withdrawal_requests' %}">Запросы на вывод</a></li>
+                </div>
+                <hr>
+                <div class="side_col text-center">
+                    <li><a href="{% url 'all_users' %}">Все пользователи</a></li>
+                </div>
+                <hr>
+            {% endif %}
                 <div class="side_col text-center">
                     <p>
                         <a style="display: inline-block;" href="{% url 'users_online' %}">

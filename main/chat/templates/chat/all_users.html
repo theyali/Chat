@@ -1,0 +1,51 @@
+{% extends 'main.html' %}
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}Все пользователи{{ user }}{% endblock page_title %}
+
+{% block main %}
+
+
+<table class="table table-bordered table-dark">
+    <thead>
+        <tr>
+            <th scope="col">Email пользователя</th>
+            <th scope="col">Username пользователя</th>
+            <th scope="col">Дата регистрации</th>
+            <th scope="col">В сети?</th>
+            <th scope="col">Сколько вложил</th>
+            <th scope="col">Сколько выиграл</th>
+            <th scope="col">Сколько вывел</th>
+            <th scope="col">Удалить участника</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in user_data %}
+            <tr>
+                <th scope="row">{{ data.user.email }}</th>
+                <th>{{ data.user.username }}</th>
+                <th>{{ data.user.date_joined }}</th>
+
+                <td>
+                    {% if data.profile.is_online %}
+                        Да
+                    {% else %}
+                        Нет
+                    {% endif %}
+                </td>
+                <td>{{ data.transaction_sum }}</td>
+                <td>{{ data.bet_sum }}</td>
+                <td>Put withdrawal amount here</td>
+                <td>
+                    <a href="{% url 'delete_user' data.user.id %}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock main %}

@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+
+{% block user_count %}
+{{ user_count }}
+{% endblock user_count %}
+
+{% block page_title %}Confirm Delete{{ user }}{% endblock page_title %}
+
+
+{% block main %}
+<style>
+    .wrappper.pp {
+        margin: auto;
+        text-align: center;
+    
+      }
+</style>
+<div class="wrappper pp">
+    <div class="title">Точно хотите Удалить пользователя {{ user.username }}?</div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="field">
+        <button type="submit" class="site-btn">Удалить</button>
+    </div>
+    <div class="signup-link" id="resend-link">
+        <a href="{% url 'all_users' %}">Отмена</a>
+    </div>
+</form>
+
+</div>
+{% endblock main %}
