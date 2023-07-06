@@ -41,15 +41,25 @@ class Wallet(models.Model):
         return self.user_profile.user.username + ' - Wallet'
     
 class Transaction(models.Model):
+    DEPOSIT = 'deposit'
+    WITHDRAWAL = 'withdrawal'
+
+    TRANSACTION_TYPES = (
+        (DEPOSIT, 'Deposit'),
+        (WITHDRAWAL, 'Withdrawal'),
+    )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=5, decimal_places=2)
+    type = models.CharField(max_length=10, choices=TRANSACTION_TYPES, default=DEPOSIT)
     status = models.CharField(max_length=10, choices=[('pending', 'Ожидает'), ('completed', 'Выполнено'), ('failed', 'Не выполнено')])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    payeer = models.CharField(max_length=24, blank=True)
 
     def __str__(self):
-        return f'Transaction #{self.id} ({self.user.username}): {self.amount}'
+        return f'Transaction #{self.id} ({self.user.username}): {self.amount} - {self.get_type_display()}'
 
     
 class Game(models.Model):

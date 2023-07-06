@@ -88,10 +88,6 @@
                     <li><a href="">Настройки</a></li>
                 </div>   
                 <hr>
-                <div class="side_col text-center">
-                    <li><a href="">Тех поддержка</a></li>
-                </div>
-                <hr>
                 {% if request.user.is_superuser %}
                 <div class="side_col text-center">
                     <li><a href="{% url 'withdrawal_requests' %}">Запросы на вывод</a></li>
@@ -160,23 +156,6 @@
 </div>
 
     {% include 'footer.html' %}
-
-
-    <script>
-        let socket = new WebSocket("ws://localhost:8000/ws/common/");
-    
-        socket.onopen = function(e) {
-            let intervalId = setInterval(function(){
-                console.log("Sending ping to server");
-                socket.send(JSON.stringify({type: 'ping'}));
-            }, 60000);  // send 'ping' every 1 minute
-    
-            // After 2 minutes (120000 milliseconds), stop sending pings
-            setTimeout(function() {
-                clearInterval(intervalId);
-            }, 120000);
-        };
-    </script>
     
     <!-- Js Plugins -->
     <script src="{% static 'chat/js/jquery-3.3.1.min.js' %} "></script>

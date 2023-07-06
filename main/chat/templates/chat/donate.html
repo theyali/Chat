@@ -9,7 +9,6 @@
 
 <div class="wrappper m-auto">
     <div class="title" style="margin-bottom:5%;">Пополнение счета</div>
-
     <form action="" method="POST">
         {% csrf_token %}
         {% for field in form %}
@@ -26,6 +25,8 @@
     </form>
 
 </div>
+
+
 <script>
     window.addEventListener("load", function() {
         // Get all input fields

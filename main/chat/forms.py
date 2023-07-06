@@ -33,18 +33,17 @@ class MyUserCreationForm(UserCreationForm):
         
 
 class WithdrawalForm(forms.Form):
-    amount = forms.DecimalField(max_digits=4, decimal_places=2, min_value=0.01, help_text='Amount to withdraw')
-    paypal_email = forms.EmailField(help_text='Your PayPal email address')
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
-        super().__init__(*args, **kwargs)
-
-    def clean_amount(self):
-        amount = self.cleaned_data.get('amount')
-        if self.user.balance < amount:
-            raise forms.ValidationError('Insufficient balance.')
-        return amount
+    amount = forms.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        min_value=0.01,
+        help_text='Amount to withdraw',
+        label='Amount'
+    )
+    payeer_account = forms.CharField(
+        help_text='Your Payeer account',
+        label='Payeer Account'
+    )
     
 class DepositForm(forms.Form):
     amount = forms.DecimalField(max_digits=5, decimal_places=2, min_value=3, help_text='Введите сумму')

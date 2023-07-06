@@ -18,7 +18,6 @@
             <th scope="col">В сети?</th>
             <th scope="col">Сколько вложил</th>
             <th scope="col">Сколько выиграл</th>
-            <th scope="col">Сколько вывел</th>
             <th scope="col">Удалить участника</th>
         </tr>
     </thead>
@@ -38,7 +37,6 @@
                 </td>
                 <td>{{ data.transaction_sum }}</td>
                 <td>{{ data.bet_sum }}</td>
-                <td>Put withdrawal amount here</td>
                 <td>
                     <a href="{% url 'delete_user' data.user.id %}">Delete</a>
                 </td>

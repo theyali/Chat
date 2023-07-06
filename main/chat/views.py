@@ -6,7 +6,7 @@ from django.contrib import messages
 from .utils import DecimalEncoder, generate_ref_code
 from .models import User, UserProfile, Wallet, Transaction, Game, Game_Bet
 from django.contrib.auth import authenticate, login, logout
-from .forms import MyUserCreationForm, DepositForm
+from .forms import MyUserCreationForm, DepositForm, WithdrawalForm
 from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -210,6 +210,52 @@ def donate(request):
     return render(request, 'chat/donate.html', context=context)
 
 @login_required
+def withdraw(request):
+    context = get_common_context(request)
+    if request.method == 'POST':
+        form = WithdrawalForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            payeer = form.cleaned_data['payeer_account']
+            # Store the amount in the session
+            json_data = json.dumps(amount, cls=DecimalEncoder)
+            request.session['withdrawal_amount'] = json_data
+            user_profile = UserProfile.objects.get(user=request.user)
+            wallet = Wallet.objects.get(user_profile=user_profile)
+            if wallet.balance >= amount:
+                # Create a new transaction
+                transaction = Transaction(
+                    user=request.user,
+                    amount=amount,
+                    status='pending',
+                    created_at=timezone.now(),
+                    updated_at=timezone.now(),
+                    type='withdrawal',
+                    payeer = payeer
+                )
+                transaction.save()
+                # Process the donation with the given amount
+                # Redirect to a success page or display a success message
+                return redirect('proceed_withdraw')
+            else:
+                print('Error')
+                messages.error(request, "У вас недостаточно баланса")
+    else:
+        form = WithdrawalForm()
+    context['form'] = form
+    return render(request, 'chat/withdraw.html', context=context)
+
+@login_required
+def balance(request):
+    context = get_common_context(request)
+    return render(request, 'chat/balance.html', context=context)
+
+@login_required
+def proceed_withdraw(request):
+    context = get_common_context(request)
+    return render(request, 'chat/proceed_withdraw.html', context=context)
+
+@login_required
 def proceed_donate(request):
     context = get_common_context(request)
     # Get the amount from the session
@@ -343,9 +389,20 @@ def delete_game(request, game_id):
     else:
         return JsonResponse({'error': 'Game not found.'}, status=404)
     
-@login_required
+login_required
 def withdrawal_requests(request):
+    if request.method == 'POST':
+        transaction = Transaction.objects.select_for_update().get(id=request.POST['change_status'],)
+        transaction.status = request.POST['status_16']
+        transaction.save()
+    # Filter transactions for the current user with type of withdrawal
+    transactions = Transaction.objects.filter(type=Transaction.WITHDRAWAL, status='pending')
+    # Get common context if necessary
     context = get_common_context(request)
+    
+    # Add transactions to context
+    context['transactions'] = transactions
+    
     return render(request, 'chat/withdrawal_requests.html', context=context)
 
 

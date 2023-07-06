@@ -8,28 +8,48 @@
 
 {% block main %}
 
+<form method="post" action="">
+    {% csrf_token %}
 
-<table class="table table-bordered table-dark">
-    <thead class="">
-        <tr>
-            <th scope="col">Номер транзакции</th>
-            <th scope="col">Код транзакции</th>
-            <th scope="col">Дата транзакции</th>
-            <th scope="col">Сумма</th>
-            <th scope="col">Статус</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for tr in transaction %}
+    <table class="table table-bordered table-dark">
+        <thead class="">
             <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <th scope="row">2137Ahgd2</th>
-                <td>{{ tr.created_at }}</td>
-                <td>{{ tr.amount }}</td>
-                <td>{{ tr.status }}</td>
+                <th scope="col">Номер транзакции</th>
+                <th scope="col">Дата транзакции</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Payeer</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Actions</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            {% for tr in transactions %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ tr.created_at }}</td>
+                    <td>{{ tr.amount }}</td>
+                    <td>{{ tr.payeer }}</td>
+                    <td>
+                        <select name="status_{{ tr.id }}" class="select">
+                            <option value="pending" {% if tr.status == 'pending' %}selected{% endif %}>Ожидает</option>
+                            <option value="completed" {% if tr.status == 'completed' %}selected{% endif %}>Выполнено</option>
+                            <option value="failed" {% if tr.status == 'failed' %}selected{% endif %}>Не выполнено</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" name="change_status" value="{{ tr.id }}">Поменять статус</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+<style>
+    .select option{
+        color:black;
+    }
+    .select{
+        background-color:black;
+    }
+</style>
 {% endblock main %}
