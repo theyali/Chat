@@ -42,13 +42,17 @@ def get_online_users():
 
 
 def get_common_context(request):
+    username=''
     try:
         wallet = request.wallet
         balance = wallet.balance
+        username = request.user.username
     except:
         balance = ''
+        username=''
     return {
         'balance': balance,
+        'username':username
     }
 
 def home(request):

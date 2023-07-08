@@ -31,7 +31,7 @@
 /* Template default CSS
 /*----------------------------------------*/
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700;800;900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap');
 html,
 body {
 	height: 100%;
@@ -378,7 +378,7 @@ ol {
 -----------------------*/
 
 .header {
-	background: #070720;
+	background: #1C1F2C;
 	width: 100%;
 }
 
@@ -403,7 +403,6 @@ ol {
 }
 
 .header__menu ul li.active a {
-	background: #e53637;
 	color: #ffffff;
 }
 
@@ -493,24 +492,160 @@ ol {
 	top: 2px;
 }
 
-.header__right {
-	text-align: right;
-	padding: 20px 0 15px;
+.balance_section {
+	width: 181px;
+	height: 44px;
+	flex-shrink: 0;
+	border-radius: 40px;
+	background: #222937;
+	box-shadow: 0px 4px 9px 0px rgba(0, 0, 0, 0.09);
+	margin-top:5%;
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 }
-
-.header__right a {
-	display: inline-block;
-	font-size: 18px;
-	color: #ffffff;
-	margin-right: 26px;
+.balance_section .currency_icon{
+	display: flex;
+	width: 28px;
+	height: 28px;
+	padding: 2.007px;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	border-radius: 40px;
+	background: var(--orange, #FF902E);
+	margin-left: 5%;
+}
+.balance_section a{
+	color: #FFF;
+	font-family: Nunito;
+	font-size: 15px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 120%;
+	text-decoration: none;
+}
+.plus_circle{
+	border-radius: 40px;
+	background: var(--btn, radial-gradient(155.20% 155.87% at 31.94% -11.82%, #9186FF 0%, #5268F9 36.69%, #4E61F5 91.62%));
+	width: 40px;
+	height: 40px;
+	flex-shrink: 0;
+	text-align: center;
+}
+.plus_circle img{
+	filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.09));
+	margin-top: 25%;
 }
 
-.header__right a:last-child {
-	margin-right: 0;
+.user_section{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.user_section .username{
+	margin-left: 20%;
+	color: #FFF;
+text-align: right;
+font-family: Nunito;
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 120%;
+margin-top: 5%;
+}
+.user_image{
+	display: flex;
+	width: 60px;
+	height: 60px;
+	padding: 3px;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	border-radius: 100%;
+	border-color: green;
+	border: 3px solid green;
+	margin-top: 2%;
+	position: relative;  /* Add this */
+
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    opacity: 0;  /* Add this */
+    transition: opacity 0.5s ease-in-out;  /* Add this */
+	top: 100%;  /* Add this */
+
 }
 
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.user_image:hover .dropdown-content {
+    display: block;
+    opacity: 1;  /* Add this */
+}
+.sign_log{
+	display: flex;
+	justify-content: space-between;
+	margin-top: 3%;
+}
+.log_in{
+	display: flex;
+	width: 72px;
+	height: 44px;
+	padding: 10px;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+	border-radius: 12px;
+	background: var(--btn, radial-gradient(155.20% 155.87% at 31.94% -11.82%, #9186FF 0%, #5268F9 36.69%, #4E61F5 91.62%));
+	box-shadow: 0px 4px 9px 0px rgba(0, 0, 0, 0.09);
+	}
+.sign_up{
+	display: flex;
+	width: 110px;
+	height: 44px;
+	padding: 10px;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+	border-radius: 12px;
+	background: linear-gradient(180deg, #FF902E 0%, #E37514 100%);
+	box-shadow: 0px 4px 9px 0px rgba(0, 0, 0, 0.09);
+	margin-right: 55%;
+}
+.sign_up p {
+	color: #FFF;
+	font-family: 'Nunito', sans-serif;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+	margin-top: 10%;
+}
+.log_in p {
+	color: #FFF;
+	font-family: 'Nunito', sans-serif;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+	margin-top: 30%;
+	}
+.sign_log a{
+	text-decoration: none;
+}
 .slicknav_menu {
 	display: none;
 }

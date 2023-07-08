@@ -9,7 +9,7 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <div class="header__nav">
                     <nav class="header__menu mobile-menu">
                         <ul>
@@ -29,24 +29,57 @@
                     </nav>
                 </div>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-4">
                 <div class="header__right">
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'balance' %}" class="balance"><span class=" btn btn-light btn-sm">Баланс: {{ balance }}</span></a>
+                        <div class="row">
+                            <div class="col">
+                            <section class="balance_section">
+                                <span class='currency_icon'><img src="{% static 'chat/img/dollar.png' %}" alt=""></span>
+                                <a href="{% url 'balance' %}" class="balance">{{ balance }}</a>
+                                <span class='plus_circle'><img src="{% static 'chat/img/plus.svg' %}"></span>
+                            </section>
+                            </div>
                     {% endif %}
-                    <style>
-                        .balance{
-                            margin-right: 5%;
-                        }
-                    </style>
-
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'logout' %}"><img src="{% static 'chat/img/log-out.png' %}" width='20' alt="Log out"></a>
+
+                            <div class="col">
+                                <section class="user_section">
+                                    <div class="username">
+                                        {{ username }}
+                                    </div>
+
+                                    <div class="user_image">
+                                        <a href=""><img src="{% static 'chat/img/man.png' %}" alt=""></a>
+                                        <div class="dropdown-content">
+                                            <a href="#">My Profile</a>
+                                            <a href="">Withdrawals</a>
+                                            <a href="{% url 'logout' %}">Log out</a>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
                     {% else %}
-                        <a href="{% url 'login' %}"><span class="icon_profile"></span></a>
+                    <section class="sign_log">
+                        <span class="log_in">
+                            <a href="{% url 'login' %}"><p>Войти</p></a>
+                        </span>
+
+                        <span class="sign_up">
+                            <a href="{% url 'register' %}"><p>Регистрация</p></a>
+                        </span>
+                    </section>
+                        
                     {% endif %}
+
                 </div>
             </div>
+            {% comment %} {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}"><img src="{% static 'chat/img/log-out.png' %}" width='20' alt="Log out"></a>
+        {% else %}
+            <a href="{% url 'login' %}"><span class="icon_profile"></span></a>
+        {% endif %} {% endcomment %}
         </div>
         <div id="mobile-menu-wrap"></div>
     </div>
