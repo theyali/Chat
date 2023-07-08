@@ -16,6 +16,7 @@
             <th scope="col">Код транзакции</th>
             <th scope="col">Дата транзакции</th>
             <th scope="col">Сумма</th>
+            <th scope="col">Операция</th>
             <th scope="col">Статус</th>
         </tr>
     </thead>
@@ -26,6 +27,7 @@
                 <th scope="row">2137Ahgd2</th>
                 <td>{{ tr.created_at }}</td>
                 <td>{{ tr.amount }}</td>
+                <td>{{ tr.type }}</td>
                 <td>{{ tr.status }}</td>
             </tr>
         {% endfor %}
