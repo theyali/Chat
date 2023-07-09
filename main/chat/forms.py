@@ -9,11 +9,11 @@ class MyUserCreationForm(UserCreationForm):
     password1 = forms.CharField(
         label="Password",
         strip=False,
-        widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'})
+        widget=forms.PasswordInput(attrs={'placeholder': 'Пароль', 'class':'input_modal'})
     )
     password2 = forms.CharField(
         label="Confirm Password",
-        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm your password'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Подтвердите пароль', 'class':'input_modal'}),
         strip=False,
         help_text="Enter the same password as before, for verification."
     )
@@ -23,10 +23,10 @@ class MyUserCreationForm(UserCreationForm):
         fields = ['username', 'email']
 
         widgets = {
-            'email': forms.EmailInput(attrs={'placeholder': 'Email address'}),
-            'password1': forms.PasswordInput(attrs={'placeholder': 'Password'}),
-            'password2': forms.PasswordInput(attrs={'placeholder': 'Confirm your Password'}),
-            'username': forms.TextInput(attrs={'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Электронная почта', 'class':'input_modal'}),
+            'password1': forms.PasswordInput(attrs={'placeholder': 'Пароль', 'class':'input_modal'}),
+            'password2': forms.PasswordInput(attrs={'placeholder': 'Подтвердите пароль'}),
+            'username': forms.TextInput(attrs={'placeholder': 'Логин', 'class':'input_modal'}),
         }
 
     

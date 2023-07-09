@@ -57,6 +57,39 @@ def get_common_context(request):
 
 def home(request):
     context= get_common_context(request)
+    form = MyUserCreationForm()
+    if request.method == "POST":
+        form = MyUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            request.session["username"] = user.username
+            user.is_active = False  # Set the user to inactive until email is confirmed
+            user.save()
+            confirmation_code = user.generate_email_verification_code()
+            user.save()
+            # Create UserProfile object for the new user
+            try:
+                user_profile = UserProfile(user=user ,recomended_by_id=request.session['ref_profile'])
+                user_profile.save()
+            except:
+                user_profile = UserProfile(user=user)
+                user_profile.save()
+            user_profile = UserProfile.objects.select_for_update().get(user=user)
+            user_profile.referal_code = generate_ref_code()
+            user_profile.save() 
+            Wallet.objects.create(user_profile=user_profile, wallet_number=str(uuid.uuid4()))
+            # Send the confirmation email
+            subject = 'Confirm your email address'
+            message = f'Your confirmation code is {confirmation_code}'
+            from_email = 'haciyev.ali@hotmail.com'
+            to_email = [user.email]
+            send_mail(subject, message,from_email, to_email)
+            return JsonResponse({'status': 'success', 'message': 'Registration successful! Please confirm your email.'})
+        else:
+            messages.error(request, "Произошла ошибка во время регистрации")
+            return JsonResponse({'status': 'error', 'message': 'Произошла ошибка во время регистрации', 'redirect': 'home'}, status=400)
+    context['form']=form
     return render(request, 'chat/home.html',context=context)
 
 def ref_home(request, *args, **kwargs):
@@ -89,7 +122,7 @@ def login_user(request):
             return redirect("profile")
         else:
             messages.error(request, "Почта или пароль неверны")
-    return render(request, 'chat/login.html', {})
+    return render(request, 'chat/home.html', {})
 
 @login_required
 def logout_user(request):
@@ -99,42 +132,6 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
-
-def register_user(request):
-    form = MyUserCreationForm()
-    if request.method == "POST":
-        form = MyUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username.lower()
-            request.session["username"] = user.username
-            user.is_active = False  # Set the user to inactive until email is confirmed
-            user.save()
-            confirmation_code = user.generate_email_verification_code()
-            user.save()
-            # Create UserProfile object for the new user
-            try:
-                user_profile = UserProfile(user=user ,recomended_by_id=request.session['ref_profile'])
-                user_profile.save()
-            except:
-                user_profile = UserProfile(user=user)
-                user_profile.save()
-            user_profile = UserProfile.objects.select_for_update().get(user=user)
-            user_profile.referal_code = generate_ref_code()
-            user_profile.save() 
-            Wallet.objects.create(user_profile=user_profile, wallet_number=str(uuid.uuid4()))
-            # Send the confirmation email
-            subject = 'Confirm your email address'
-            message = f'Your confirmation code is {confirmation_code}'
-            from_email = 'haciyev.ali@hotmail.com'
-            to_email = [user.email]
-            send_mail(subject, message,from_email, to_email)
-            return redirect('email_confirmation')
-        else:
-            messages.error(request, "Произошла ошибка во время регистрации")
-    return render(request, 'chat/register.html', {
-        'form':form
-    })
 
 def email_confirmation(request):
     # check if user is authenticated (i.e., has just registered)

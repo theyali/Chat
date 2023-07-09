@@ -232,16 +232,14 @@ ol {
 }
 
 .site-btn {
-	font-size: 13px;
-	color: #ffffff;
-	background: #e53637;
-	font-weight: 700;
-	border: none;
-	border-radius: 2px;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	display: inline-block;
-	padding: 12px 30px;
+	display: flex;
+	width: 310px;
+	padding: 15px 0px;
+	justify-content: center;
+	align-items: center;
+	border-radius: 40px;
+	opacity: 0.5;
+	background: var(--btn, radial-gradient(155.20% 155.87% at 31.94% -11.82%, #9186FF 0%, #5268F9 36.69%, #4E61F5 91.62%));
 }
 
 /* Preloder */
@@ -646,10 +644,129 @@ margin-top: 5%;
 .sign_log a{
 	text-decoration: none;
 }
+
+/*
+		Modals
+*/
 .slicknav_menu {
 	display: none;
 }
+.modal-content{
+	background: #262A3B!important;
+	border: none!important;
+}
+.modal-header{
+	border: none!important;
+}
+.modal-title{
+	color: #FFF;
+	text-align: center;
+	font-family: Nunito;
+	font-size: 24px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+}
+button.close{
+	display: flex;
+	width: 30px;
+	height: 30px;
+	padding: 2px;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	border-radius: 40px;
+	background: #1C1F2C;
+}
+button svg{
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+}
 
+.input_modal{
+	display: inline-flex;
+	padding: 10px 131px 10px 16px;
+	align-items: center;
+	gap: 16px;
+	border-radius: 12px;
+	color: #626984;
+	font-family: Nunito;
+	font-size: 15px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 120%;
+}
+
+input[type="text"], textarea {
+	background : #1C1F2C; 
+  }
+input[type="password"], textarea {
+	background : #1C1F2C; 
+  }
+.email_label{
+	color: #FFF;
+	font-family: Nunito;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+}
+#loginModal{
+	border-radius: 40px;
+	background: #262A3B;
+	width: 400px;
+	height: 389px;
+	margin-left: 40%;
+	margin-top: 10%;
+}
+#registerModal{
+	border-radius: 40px;
+	background: #262A3B;
+	width: 420px;
+	height: 570px;
+	margin-left: 40%;
+	margin-top: 10%;
+}
+#confirmEmailModal{
+	border-radius: 40px;
+	background: #262A3B;
+	width: 400px;
+	height: 389px;
+	margin-left: 40%;
+	margin-top: 10%;
+}
+
+.confirm_section{
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-btn {
+	display: flex;
+	width: 310px;
+	padding: 15px 0px;
+	justify-content: center;
+	align-items: center;
+	border-radius: 40px;
+	background: var(--btn, radial-gradient(155.20% 155.87% at 31.94% -11.82%, #9186FF 0%, #5268F9 36.69%, #4E61F5 91.62%));
+	margin-top: 10%;
+	color: #FFF;
+	text-align: center;
+	font-family: Nunito;
+	font-size: 15px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 120%;
+}
+.modal-open {
+    overflow: hidden;
+}
+
+.modal-open .hero{
+    -webkit-filter: blur(5px); /* Chrome, Safari, Opera */
+    filter: blur(5px);
+}
 /*---------------------
   Hero
 -----------------------*/
