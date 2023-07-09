@@ -6,7 +6,7 @@ from django.contrib import messages
 from .utils import DecimalEncoder, generate_ref_code
 from .models import User, UserProfile, Wallet, Transaction, Game, Game_Bet
 from django.contrib.auth import authenticate, login, logout
-from .forms import MyUserCreationForm, DepositForm, WithdrawalForm
+from .forms import MyUserCreationForm, DepositForm, WithdrawalForm, LoginForm
 from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -56,41 +56,67 @@ def get_common_context(request):
     }
 
 def home(request):
-    context= get_common_context(request)
-    form = MyUserCreationForm()
     if request.method == "POST":
-        form = MyUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username.lower()
-            request.session["username"] = user.username
-            user.is_active = False  # Set the user to inactive until email is confirmed
-            user.save()
-            confirmation_code = user.generate_email_verification_code()
-            user.save()
-            # Create UserProfile object for the new user
-            try:
-                user_profile = UserProfile(user=user ,recomended_by_id=request.session['ref_profile'])
-                user_profile.save()
-            except:
-                user_profile = UserProfile(user=user)
-                user_profile.save()
-            user_profile = UserProfile.objects.select_for_update().get(user=user)
-            user_profile.referal_code = generate_ref_code()
-            user_profile.save() 
-            Wallet.objects.create(user_profile=user_profile, wallet_number=str(uuid.uuid4()))
-            # Send the confirmation email
-            subject = 'Confirm your email address'
-            message = f'Your confirmation code is {confirmation_code}'
-            from_email = 'haciyev.ali@hotmail.com'
-            to_email = [user.email]
-            send_mail(subject, message,from_email, to_email)
-            return JsonResponse({'status': 'success', 'message': 'Registration successful! Please confirm your email.'})
+        action = request.POST.get('action')
+        if action == 'login':
+            # The login case
+            form = LoginForm(request.POST)
+            if form.is_valid():
+                email = form.cleaned_data.get('email')
+                password = form.cleaned_data.get('password')
+                user = authenticate(request, email=email, password=password)
+                if user is not None:
+                    login(request, user)
+                    user_profile = get_object_or_404(UserProfile, user=user)
+                    user_profile.is_online = True
+                    user_profile.save()
+                    wallet = get_object_or_404(Wallet, user_profile=user_profile)
+                    request.session['wallet_id'] = wallet.id
+                    return JsonResponse({'status': 'success', 'message': 'Logged in successfully!', 'redirect': reverse('profile')})  # assuming you have a url named 'profile'
+                else:
+                    return JsonResponse({'status': 'error', 'message': 'Email or password incorrect.'}, status=400)
+            else:
+                form_errors = form.errors.as_json()
+                return JsonResponse({'status': 'error', 'message': 'Invalid login form data.', 'errors': form_errors}, status=400)
+        elif action == 'register':
+            # The registration case
+            form = MyUserCreationForm(request.POST)
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.username = user.username.lower()
+                request.session["username"] = user.username
+                user.is_active = False  # Set the user to inactive until email is confirmed
+                user.save()
+                confirmation_code = user.generate_email_verification_code()
+                user.save()
+                # Create UserProfile object for the new user
+                try:
+                    user_profile = UserProfile(user=user ,recomended_by_id=request.session['ref_profile'])
+                    user_profile.save()
+                except:
+                    user_profile = UserProfile(user=user)
+                    user_profile.save()
+                user_profile = UserProfile.objects.select_for_update().get(user=user)
+                user_profile.referal_code = generate_ref_code()
+                user_profile.save() 
+                Wallet.objects.create(user_profile=user_profile, wallet_number=str(uuid.uuid4()))
+                # Send the confirmation email
+                subject = 'Confirm your email address'
+                message = f'Your confirmation code is {confirmation_code}'
+                from_email = 'haciyev.ali@hotmail.com'
+                to_email = [user.email]
+                send_mail(subject, message,from_email, to_email)
+                return JsonResponse({'status': 'success', 'message': 'Registration successful! Please confirm your email.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Error occurred during registration.', 'redirect': 'home'}, status=400)
         else:
-            messages.error(request, "Произошла ошибка во время регистрации")
-            return JsonResponse({'status': 'error', 'message': 'Произошла ошибка во время регистрации', 'redirect': 'home'}, status=400)
-    context['form']=form
-    return render(request, 'chat/home.html',context=context)
+            return JsonResponse({'status': 'error', 'message': 'Invalid action.'}, status=400)
+    else:
+        # If it's a GET request, render the page with the two forms
+        login_form = LoginForm()
+        registration_form = MyUserCreationForm()
+        context = {'login_form': login_form, 'registration_form': registration_form}
+        return render(request, 'chat/home.html', context)
 
 def ref_home(request, *args, **kwargs):
     code = str(kwargs.get('ref_code'))
@@ -108,6 +134,7 @@ def profile(request):
     return render(request, 'chat/profile.html', context=context)
 
 def login_user(request):
+    form = MyUserCreationForm()
     if request.method == "POST":
         email = request.POST.get('email').lower()
         password = request.POST.get('password')
@@ -122,7 +149,7 @@ def login_user(request):
             return redirect("profile")
         else:
             messages.error(request, "Почта или пароль неверны")
-    return render(request, 'chat/home.html', {})
+    return render(request, 'chat/home.html', {'form':form})
 
 @login_required
 def logout_user(request):
